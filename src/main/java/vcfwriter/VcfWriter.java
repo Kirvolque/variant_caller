@@ -1,4 +1,4 @@
-package VcfWriter;
+package vcfwriter;
 
 public class VcfWriter {
 }
