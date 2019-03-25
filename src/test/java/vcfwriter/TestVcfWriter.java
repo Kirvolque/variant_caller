@@ -1,7 +1,8 @@
 package vcfwriter;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import vcfwriter.variation.Variation;
 
 import java.io.File;
@@ -12,11 +13,12 @@ import java.util.List;
 import java.util.Scanner;
 
 public class TestVcfWriter {
+
   @Test
   public void fileCreate() {
     try (VcfWriter vcfWriter = new VcfWriter("result.vcf")) {
       File file = new File("result.vcf");
-      Assert.assertTrue(Files.exists(file.toPath()));
+      Assertions.assertTrue(Files.exists(file.toPath()));
     }
     catch (IOException e) {
       System.out.println(e.getMessage());
@@ -36,18 +38,18 @@ public class TestVcfWriter {
       vcfWriter.close();
       File file = new File("C:\\Education\\BioScience\\variant_caller\\src\\test\\resources\\result.vcf");
       Scanner scanner = new Scanner(file);
-      Assert.assertTrue(scanner.next().equals("20"));
-      Assert.assertTrue(scanner.nextInt() == 1444);
-      Assert.assertTrue(scanner.next().equals("."));
-      Assert.assertTrue(scanner.next().equals("G"));
-      Assert.assertTrue(scanner.next().equals("A"));
-      Assert.assertTrue(scanner.next().equals("."));
-      Assert.assertTrue(scanner.next().equals("."));
-      Assert.assertTrue(scanner.next().equals("."));
+      Assertions.assertTrue(scanner.next().equals("20"));
+      Assertions.assertTrue(scanner.nextInt() == 1444);
+      Assertions.assertTrue(scanner.next().equals("."));
+      Assertions.assertTrue(scanner.next().equals("G"));
+      Assertions.assertTrue(scanner.next().equals("A"));
+      Assertions.assertTrue(scanner.next().equals("."));
+      Assertions.assertTrue(scanner.next().equals("."));
+      Assertions.assertTrue(scanner.next().equals("."));
 
-      Assert.assertTrue(scanner.next().equals("20"));
-      Assert.assertTrue(scanner.nextInt() == 1444);
-      Assert.assertTrue(scanner.next().equals("microsati"));
+      Assertions.assertTrue(scanner.next().equals("20"));
+      Assertions.assertTrue(scanner.nextInt() == 1444);
+      Assertions.assertTrue(scanner.next().equals("microsati"));
       scanner.close();
     }
     catch (IOException e) {
@@ -64,16 +66,16 @@ public class TestVcfWriter {
       vcfWriter.close();
       File file = new File("C:\\Education\\BioScience\\variant_caller\\src\\test\\resources\\result.vcf");
       Scanner scanner = new Scanner(file);
-      Assert.assertTrue(scanner.next().equals("#CHROM"));
-      Assert.assertTrue(scanner.next().equals("POS"));
-      Assert.assertTrue(scanner.next().equals("ID"));
-      Assert.assertTrue(scanner.next().equals("REF"));
-      Assert.assertTrue(scanner.next().equals("ALT"));
-      Assert.assertTrue(scanner.next().equals("QUAL"));
-      Assert.assertTrue(scanner.next().equals("FILTER"));
-      Assert.assertTrue(scanner.next().equals("INFO"));
-      Assert.assertTrue(scanner.hasNextLine());
-      Assert.assertFalse(scanner.hasNext());
+      Assertions.assertTrue(scanner.next().equals("#CHROM"));
+      Assertions.assertTrue(scanner.next().equals("POS"));
+      Assertions.assertTrue(scanner.next().equals("ID"));
+      Assertions.assertTrue(scanner.next().equals("REF"));
+      Assertions.assertTrue(scanner.next().equals("ALT"));
+      Assertions.assertTrue(scanner.next().equals("QUAL"));
+      Assertions.assertTrue(scanner.next().equals("FILTER"));
+      Assertions.assertTrue(scanner.next().equals("INFO"));
+      Assertions.assertTrue(scanner.hasNextLine());
+      Assertions.assertFalse(scanner.hasNext());
       scanner.close();
     }
     catch (IOException e) {
