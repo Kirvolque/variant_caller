@@ -7,45 +7,43 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FastaParser {
-  private static final Set<Character> separatorCharacters = new HashSet<Character>() {{
-    add('>');
-    add(';');
-  }};
+  private static final char HEADER_START_SYMBOL_1 = '>';
+  private static final char HEADER_START_SYMBOL_2 = ';';
 
   public static FastaSequence parseFasta(String fileName) throws IOException {
-    List<String> sequenceNames = new ArrayList<>();
-    List<String> sequences = new ArrayList<>();
-
     BufferedReader reader = new BufferedReader(new InputStreamReader(
         new FileInputStream(fileName), StandardCharsets.UTF_8));
 
     StringBuilder currentSequence = new StringBuilder();
 
     String line;
-    int currentChromosomeIndex = 0;
+
+    Map<String, String> fastaData = new HashMap<>();
+
+    String currentSequenceName = "";
+
+    if ((line = reader.readLine()) != null) {
+      currentSequenceName = line.substring(1);
+    }
 
     while ((line = reader.readLine()) != null) {
-      if (!separatorCharacters.contains(line.charAt(0))) {
+      if (!(line.charAt(0) == HEADER_START_SYMBOL_1 || line.charAt(0) == HEADER_START_SYMBOL_2)) {
         currentSequence.append(line);
       } else {
-        sequenceNames.add(line.substring(1));
-        if (currentChromosomeIndex != 0) {
-          sequences.add(currentSequence.toString());
-          currentSequence = new StringBuilder();
-        } else {
-          currentChromosomeIndex++;
-        }
+        fastaData.put(currentSequenceName, currentSequence.toString());
+        currentSequenceName = line.substring(1);
+
+        currentSequence = new StringBuilder();
       }
     }
-    sequences.add(currentSequence.toString());
+    fastaData.put(currentSequenceName, currentSequence.toString());
 
     reader.close();
-    return new FastaSequence(sequenceNames, sequences);
+
+    return new FastaSequence(fastaData);
   }
 }
