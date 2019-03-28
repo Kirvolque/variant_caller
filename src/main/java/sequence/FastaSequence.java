@@ -1,12 +1,17 @@
 package sequence;
 
 import java.util.Map;
+import java.util.Set;
 
 public class FastaSequence {
   private final Map<String, String> fastaData;
 
-  public Map<String, String> getFastaData() {
-    return fastaData;
+  public Set<String> getChromosomes() {
+    return fastaData.keySet();
+  }
+
+  public String getSequence(String chromosome) throws NullPointerException {
+    return fastaData.get(chromosome);
   }
 
   public FastaSequence(Map<String, String> fastaData) {

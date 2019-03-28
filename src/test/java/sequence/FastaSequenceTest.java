@@ -1,32 +1,31 @@
 package sequence;
 
-import fastaparser.FastaParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.Integer.MAX_VALUE;
 
 public class FastaSequenceTest {
-  private static final String FILE_NAME = "ex.fa";
   private static final String CHROMOSOME_NAME_1 = "ref";
   private static final String CHROMOSOME_NAME_2 = "ref2";
+  private static final String CHROMOSOME_SEQUENCE_1 = "AGCATGTTAGATAAGATAGCTGTGCTAGTAGGCAGTCAGCGCCATE";
+  private static final String CHROMOSOME_SEQUENCE_2 = "aggttttataaaacaattaagtctacagagcaactacgcge";
   private static final String CHROMOSOME_NAME_UNDEFINED = "ref_that_dont_exist";
 
   private static FastaSequence fastaSequence;
 
   @BeforeAll
-  @DisplayName("Init fastaParser")
+  @DisplayName("Init fastaSequence")
   public static void initFastaParser() {
-    try {
-      fastaSequence = FastaParser.parseFasta(Objects.requireNonNull(FastaSequenceTest.class.getClassLoader().getResource(FILE_NAME)).getPath());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    Map<String, String> fastaData = new HashMap<>();
+    fastaData.put(CHROMOSOME_NAME_1, CHROMOSOME_SEQUENCE_1);
+    fastaData.put(CHROMOSOME_NAME_2, CHROMOSOME_SEQUENCE_2);
+    fastaSequence = new FastaSequence(fastaData);
   }
 
   @Test
