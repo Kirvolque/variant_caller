@@ -1,5 +1,8 @@
 package vcfwriter.variation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Variation {
 
   private final String chrom;
@@ -29,27 +32,17 @@ public class Variation {
     this.currentField = 0;
   }
 
-  public String getNextField() {
-    switch (currentField) {
-      case 0: ++currentField;
-        return chrom;
-      case 1: ++currentField;
-        return String.valueOf(pos);
-      case 2: ++currentField;
-        return id;
-      case 3: ++currentField;
-        return ref;
-      case 4: ++currentField;
-        return alt;
-      case 5: ++currentField;
-        return qual;
-      case 6: ++currentField;
-        return filter;
-      case 7: ++currentField;
-        return info;
-        default: currentField = 0;
-        return "";
-    }
+  public List<String> getFieldList() {
+    List<String> fieldList = new ArrayList<>(8);
+    fieldList.add(chrom);
+    fieldList.add(String.valueOf(pos));
+    fieldList.add(id);
+    fieldList.add(ref);
+    fieldList.add(alt);
+    fieldList.add(qual);
+    fieldList.add(filter);
+    fieldList.add(info);
+    return fieldList;
   }
 
   public String toVcfLine() {
