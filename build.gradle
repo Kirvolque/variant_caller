@@ -12,5 +12,10 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '5.0'
+    testCompile("org.junit.jupiter:junit-jupiter-api:5.4.1")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.1")
+}
+
+test {
+    useJUnitPlatform()
 }
