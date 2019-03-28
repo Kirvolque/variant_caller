@@ -1,6 +1,7 @@
 package vcfwriter.variation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Variation {
@@ -33,15 +34,7 @@ public class Variation {
   }
 
   public List<String> getFieldList() {
-    List<String> fieldList = new ArrayList<>(8);
-    fieldList.add(chrom);
-    fieldList.add(String.valueOf(pos));
-    fieldList.add(id);
-    fieldList.add(ref);
-    fieldList.add(alt);
-    fieldList.add(qual);
-    fieldList.add(filter);
-    fieldList.add(info);
+    List<String> fieldList = Arrays.asList(chrom, String.valueOf(pos), id, ref, alt, qual, filter, info);
     return fieldList;
   }
 
