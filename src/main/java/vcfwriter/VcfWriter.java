@@ -11,6 +11,7 @@ import java.util.List;
 public class VcfWriter implements AutoCloseable{
 
   private FileWriter fileWriter;
+  private final String HEADER = "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\t";
 
   public VcfWriter(String path) throws IOException {
    fileWriter = new FileWriter(path);
@@ -21,14 +22,8 @@ public class VcfWriter implements AutoCloseable{
   }
 
   public void writeData(List<Variation> data) throws IOException {
-    String currentField;
     for (Variation var: data) {
-      currentField = var.getNextField();
-      while (!currentField.equals("")) {
-        fileWriter.write(currentField);
-        fileWriter.write("\t");
-        currentField = var.getNextField();
-      }
+      fileWriter.write(var.toVcfLine());
       if (PlatformUtil.isWindows()) {
         fileWriter.write("\r\n");
       }
@@ -39,14 +34,7 @@ public class VcfWriter implements AutoCloseable{
   }
 
   public void writeHeadersOfData() throws IOException {
-    fileWriter.write("#CHROM\t");
-    fileWriter.write("POS\t");
-    fileWriter.write("ID\t");
-    fileWriter.write("REF\t");
-    fileWriter.write("ALT\t");
-    fileWriter.write("QUAL\t");
-    fileWriter.write("FILTER\t");
-    fileWriter.write("INFO");
+    fileWriter.write(HEADER);
     if (PlatformUtil.isWindows()) {
       fileWriter.write("\r\n");
     } else {

@@ -14,15 +14,7 @@ public class Variation {
   private int currentField;
 
   public Variation(String chrom, int pos, String ref, String alt) {
-    this.chrom = chrom;
-    this.pos = pos;
-    this.id = ".";
-    this.ref = ref;
-    this.alt = alt;
-    this.qual = ".";
-    this.filter = ".";
-    this.info = ".";
-    this.currentField = 0;
+    this(chrom, pos, ".", ref, alt, ".", ".", ".");
   }
 
   public Variation(String chrom, int pos, String id, String ref, String alt, String qual, String filter, String info) {
@@ -58,6 +50,10 @@ public class Variation {
         default: currentField = 0;
         return "";
     }
+  }
+
+  public String toVcfLine() {
+    return String.format("%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s", chrom, pos, id, ref, alt, qual, filter, info);
   }
 
   public String getChrom() {

@@ -59,7 +59,7 @@ public class TestVcfWriter {
   }
 
   @Test
-  public void continHeaders() {
+  public void containHeaders() {
     try {
       VcfWriter vcfWriter = new VcfWriter("C:\\Education\\BioScience\\variant_caller\\src\\test\\resources\\result.vcf");
       vcfWriter.writeHeadersOfData();
