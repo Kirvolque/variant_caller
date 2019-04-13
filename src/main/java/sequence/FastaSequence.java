@@ -6,16 +6,16 @@ import java.util.Set;
 public class FastaSequence {
   private final Map<String, String> fastaData;
 
+  public FastaSequence(Map<String, String> fastaData) {
+    this.fastaData = fastaData;
+  }
+
   public Set<String> getChromosomes() {
     return fastaData.keySet();
   }
 
   public String getSequence(String chromosome) throws NullPointerException {
     return fastaData.get(chromosome);
-  }
-
-  public FastaSequence(Map<String, String> fastaData) {
-    this.fastaData = fastaData;
   }
 
   public Nucleotide getNucleotide(String chromosome, int nucleotidePosition) throws NullPointerException, IndexOutOfBoundsException {
