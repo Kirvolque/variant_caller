@@ -37,15 +37,15 @@ class IntervalListTest {
 
   @Test
   void getIntervalByIndex() {
-    Assertions.assertEquals(INTERVAL_1, intervalList.getIntervalByIndex(0).get());
-    Assertions.assertEquals(INTERVAL_2, intervalList.getIntervalByIndex(1).get());
-    Assertions.assertEquals(INTERVAL_3, intervalList.getIntervalByIndex(2).get());
+    Assertions.assertEquals(INTERVAL_1, intervalList.getIntervalByIndex(0));
+    Assertions.assertEquals(INTERVAL_2, intervalList.getIntervalByIndex(1));
+    Assertions.assertEquals(INTERVAL_3, intervalList.getIntervalByIndex(2));
   }
 
   @Test
   void getNonexistentIntervalByIndex() {
-    Assertions.assertEquals(Optional.empty(), intervalList.getIntervalByIndex(-1));
-    Assertions.assertEquals(Optional.empty(), intervalList.getIntervalByIndex(5));
+    Assertions.assertThrows(IndexOutOfBoundsException.class, () -> intervalList.getIntervalByIndex(-1));
+    Assertions.assertThrows(IndexOutOfBoundsException.class, () -> intervalList.getIntervalByIndex(5));
   }
 
   @Test

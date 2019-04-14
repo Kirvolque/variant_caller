@@ -57,11 +57,17 @@ class RegionsSequenceTest {
   }
 
   @Test
-  void getNucleotideAt() {
-    Assertions.assertEquals(Nucleotide.A, regionsSequence.getNucleotideAt(0).get());
-    Assertions.assertEquals(Nucleotide.C, regionsSequence.getNucleotideAt(32).get());
-    Assertions.assertEquals(Nucleotide.G, regionsSequence.getNucleotideAt(14).get());
-    Assertions.assertEquals(Nucleotide.T, regionsSequence.getNucleotideAt(25).get());
-    Assertions.assertEquals(Nucleotide.UNDEFINED, regionsSequence.getNucleotideAt(45).get());
+  void getNucleotideAt() throws Exception {
+    Assertions.assertEquals(Nucleotide.A, regionsSequence.getNucleotideAt(0));
+    Assertions.assertEquals(Nucleotide.C, regionsSequence.getNucleotideAt(32));
+    Assertions.assertEquals(Nucleotide.G, regionsSequence.getNucleotideAt(14));
+    Assertions.assertEquals(Nucleotide.T, regionsSequence.getNucleotideAt(25));
+    Assertions.assertEquals(Nucleotide.UNDEFINED, regionsSequence.getNucleotideAt(45));
+  }
+
+  @Test
+  void getNonexistentNucleotideAt() {
+    Assertions.assertThrows(Exception.class, () -> regionsSequence.getNucleotideAt(-1));
+    Assertions.assertThrows(Exception.class, () -> regionsSequence.getNucleotideAt(100));
   }
 }
