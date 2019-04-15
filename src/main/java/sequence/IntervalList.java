@@ -2,7 +2,6 @@ package sequence;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class IntervalList {
   private List<Interval> listWithIntervals;
@@ -31,9 +30,7 @@ public class IntervalList {
    * @return a length of intervals
    */
   public int getLength() {
-    AtomicInteger length = new AtomicInteger();
-    listWithIntervals.forEach(i -> length.addAndGet(i.getEnd() - i.getBegin() + 1));
-    return length.get();
+    return listWithIntervals.stream().mapToInt(Interval::length).sum();
   }
 
   /**
