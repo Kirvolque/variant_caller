@@ -21,26 +21,26 @@ class FastaParserTest {
 
   @BeforeAll
   @DisplayName("Init fastaParser")
-  public static void initFastaParser() throws IOException {
-      fastaSequence = FastaParser.parseFasta(Objects.requireNonNull(FastaParserTest.class.getClassLoader().getResource(FILE_NAME)).getPath());
+  static void initFastaParser() throws IOException {
+    fastaSequence = FastaParser.parseFasta(Objects.requireNonNull(FastaParserTest.class.getClassLoader().getResource(FILE_NAME)).getPath());
   }
 
   @Test
   @DisplayName("Parse unexciting file")
-  public void parseUnexcitingFile() {
+  void parseUnexcitingFile() {
     Assertions.assertThrows(IOException.class, () -> FastaParser.parseFasta("i_dont_exist.fa"));
   }
 
   @Test
   @DisplayName("Check correctness of the parsed names of sequences")
-  public void checkParsedSequenceNames() {
+  void checkParsedSequenceNames() {
     Assertions.assertTrue(fastaSequence.getChromosomes().contains(CHROMOSOME_NAME_1));
     Assertions.assertTrue(fastaSequence.getChromosomes().contains(CHROMOSOME_NAME_2));
   }
 
   @Test
   @DisplayName("Check correctness of the parsed sequences")
-  public void checkParsedSequences() {
+  void checkParsedSequences() {
     Assertions.assertEquals(CHROMOSOME_SEQUENCE_1, fastaSequence.getSequence(CHROMOSOME_NAME_1));
     Assertions.assertEquals(CHROMOSOME_SEQUENCE_2, fastaSequence.getSequence(CHROMOSOME_NAME_2));
   }

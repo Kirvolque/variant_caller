@@ -7,10 +7,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static java.lang.Integer.MAX_VALUE;
 
-public class FastaSequenceTest {
+class FastaSequenceTest {
   private static final String CHROMOSOME_NAME_1 = "ref";
   private static final String CHROMOSOME_NAME_2 = "ref2";
   private static final String CHROMOSOME_SEQUENCE_1 = "AGCATGTTAGATAAGATAGCTGTGCTAGTAGGCAGTCAGCGCCATE";
@@ -21,7 +22,7 @@ public class FastaSequenceTest {
 
   @BeforeAll
   @DisplayName("Init fastaSequence")
-  public static void initFastaParser() {
+  static void initFastaParser() {
     Map<String, String> fastaData = new HashMap<>();
     fastaData.put(CHROMOSOME_NAME_1, CHROMOSOME_SEQUENCE_1);
     fastaData.put(CHROMOSOME_NAME_2, CHROMOSOME_SEQUENCE_2);
@@ -30,17 +31,17 @@ public class FastaSequenceTest {
 
   @Test
   @DisplayName("Bad attempts to get nucleotide")
-  public void getNonexistentNucleotide() {
+  void getNonexistentNucleotide() {
     Assertions.assertThrows(IndexOutOfBoundsException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_1, MAX_VALUE));
     Assertions.assertThrows(IndexOutOfBoundsException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_1, -1));
     Assertions.assertThrows(IndexOutOfBoundsException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_2, MAX_VALUE));
     Assertions.assertThrows(IndexOutOfBoundsException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_2, -1));
-    Assertions.assertThrows(NullPointerException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_UNDEFINED, 0));
+    Assertions.assertThrows(NoSuchElementException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_UNDEFINED, 0));
   }
 
   @Test
   @DisplayName("Successful attempts to get nucleotide")
-  public void goodGetNucleotide() {
+  void goodGetNucleotide() {
     Assertions.assertEquals(Nucleotide.A, fastaSequence.getNucleotide(CHROMOSOME_NAME_1, 0));
     Assertions.assertEquals(Nucleotide.C, fastaSequence.getNucleotide(CHROMOSOME_NAME_1, 2));
     Assertions.assertEquals(Nucleotide.G, fastaSequence.getNucleotide(CHROMOSOME_NAME_1, 5));
