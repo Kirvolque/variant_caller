@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static java.lang.Integer.MAX_VALUE;
 
@@ -35,7 +36,7 @@ class FastaSequenceTest {
     Assertions.assertThrows(IndexOutOfBoundsException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_1, -1));
     Assertions.assertThrows(IndexOutOfBoundsException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_2, MAX_VALUE));
     Assertions.assertThrows(IndexOutOfBoundsException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_2, -1));
-    Assertions.assertThrows(NullPointerException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_UNDEFINED, 0));
+    Assertions.assertThrows(NoSuchElementException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_UNDEFINED, 0));
   }
 
   @Test

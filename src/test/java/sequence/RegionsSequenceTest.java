@@ -18,29 +18,29 @@ class RegionsSequenceTest {
   private static final String CHROMOSOME_SEQUENCE_SUBSTRING_3 = "GCAGTCAGCGCCATE";
   private static final String TOO_SHORT_CHROMOSOME_SEQUENCE = "AGCATGTTAGATAAGATAGCTG";
   private static RegionsSequence regionsSequence;
-  private static IntervalList intervalList;
+  private static ListOfIntervals listOfIntervals;
 
   @BeforeAll
-  @DisplayName("Init intervalList")
+  @DisplayName("Init listOfIntervals")
   static void init() {
     List<Interval> intervals = new ArrayList<>();
     intervals.add(INTERVAL_1);
     intervals.add(INTERVAL_2);
     intervals.add(INTERVAL_3);
-    intervalList = new IntervalList(intervals);
+    listOfIntervals = new ListOfIntervals(intervals);
   }
 
   @Test
-  @DisplayName("Test for intervalList in createInstance() method")
-  void testForIntervalList() throws Exception {
-    regionsSequence = RegionsSequence.createInstance(intervalList, CHROMOSOME_SEQUENCE);
-    Assertions.assertEquals(intervalList, regionsSequence.getIntervalList());
+  @DisplayName("Test for listOfIntervals in createInstance() method")
+  void testForIntervalList() {
+    regionsSequence = RegionsSequence.createInstance(listOfIntervals, CHROMOSOME_SEQUENCE);
+    Assertions.assertEquals(listOfIntervals, regionsSequence.getIntervalList());
   }
 
   @Test
   @DisplayName("Test for nucleotidesIntervals in createInstance() method")
-  void testForNucleotidesIntervals() throws Exception {
-    regionsSequence = RegionsSequence.createInstance(intervalList, CHROMOSOME_SEQUENCE);
+  void testForNucleotidesIntervals() {
+    regionsSequence = RegionsSequence.createInstance(listOfIntervals, CHROMOSOME_SEQUENCE);
 
     Assertions.assertTrue(regionsSequence.getNucleotidesIntervals().containsKey(INTERVAL_1));
     Assertions.assertTrue(regionsSequence.getNucleotidesIntervals().containsKey(INTERVAL_2));
@@ -53,7 +53,7 @@ class RegionsSequenceTest {
 
   @Test
   void createInstanceWithInvalidParams() {
-    Assertions.assertThrows(Exception.class, () -> RegionsSequence.createInstance(intervalList, TOO_SHORT_CHROMOSOME_SEQUENCE));
+    Assertions.assertThrows(Exception.class, () -> RegionsSequence.createInstance(listOfIntervals, TOO_SHORT_CHROMOSOME_SEQUENCE));
   }
 
   @Test

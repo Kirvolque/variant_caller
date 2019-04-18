@@ -1,9 +1,10 @@
 package sequence;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class IntervalList {
+public class ListOfIntervals {
   private List<Interval> listWithIntervals;
 
   /**
@@ -11,8 +12,17 @@ public class IntervalList {
    *
    * @param listWithIntervals list with intervals
    */
-  public IntervalList(List<Interval> listWithIntervals) {
+  public ListOfIntervals(List<Interval> listWithIntervals) {
     this.listWithIntervals = listWithIntervals;
+  }
+
+  /**
+   * Gets the list of intervals.
+   *
+   * @return a listWithIntervals as a list
+   */
+  public List<Interval> asList() {
+    return new ArrayList<>(this.listWithIntervals);
   }
 
   /**
@@ -40,7 +50,7 @@ public class IntervalList {
    * @return interval from the listWithIntervals
    * @throws IndexOutOfBoundsException if there is no interval under such index
    */
-  public Interval getIntervalByIndex(int index) throws IndexOutOfBoundsException {
+  public Interval getIntervalByIndex(int index) {
     return listWithIntervals.get(index);
   }
 

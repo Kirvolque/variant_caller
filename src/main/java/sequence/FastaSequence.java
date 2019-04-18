@@ -1,6 +1,7 @@
 package sequence;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class FastaSequence {
@@ -30,9 +31,12 @@ public class FastaSequence {
    *
    * @param chromosome name of the chromosome
    * @return sting of nucleotides with this chromosome name
-   * @throws NullPointerException if there is no chromosome with such name
+   * @throws NoSuchElementException if there is no chromosome with such name
    */
-  public String getSequence(String chromosome) throws NullPointerException {
+  public String getSequence(String chromosome) {
+    if (fastaData.get(chromosome) == null) {
+      throw new NoSuchElementException("No such chromosome");
+    }
     return fastaData.get(chromosome);
   }
 
@@ -42,10 +46,9 @@ public class FastaSequence {
    * @param chromosome         name of the chromosome
    * @param nucleotidePosition position of the nucleotide in this chromosome
    * @return nucleotide in this position
-   * @throws NullPointerException      if there is no chromosome with such name
-   * @throws IndexOutOfBoundsException if there is no nucleotide in this position
+   * @throws IndexOutOfBoundsException if there is no such position in this chromosome
    */
-  public Nucleotide getNucleotide(String chromosome, int nucleotidePosition) throws NullPointerException, IndexOutOfBoundsException {
-    return Nucleotide.fromString(Character.toString(fastaData.get(chromosome).charAt(nucleotidePosition)));
+  public Nucleotide getNucleotide(String chromosome, int nucleotidePosition) {
+    return Nucleotide.fromString(Character.toString(getSequence(chromosome).charAt(nucleotidePosition)));
   }
 }

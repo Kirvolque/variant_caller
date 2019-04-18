@@ -28,6 +28,6 @@ public class Interval {
 
 
   public boolean contains(int position) {
-    return (position >= begin) && (position <= end);
+    return (begin <= position) && (position <= end);
   }
 }
