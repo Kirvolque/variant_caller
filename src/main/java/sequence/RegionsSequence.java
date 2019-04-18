@@ -69,10 +69,10 @@ public class RegionsSequence {
    *
    * @param position position to be found in the nucleotidesIntervals
    * @return nucleotide in this position if it exists
-   * @throws Exception if position is not covered by any region
+   * @throws RuntimeException if position is not covered by any region
    */
-  public Nucleotide getNucleotideAt(int position) throws Exception {
-    Interval interval = listOfIntervals.getIntervalByPosition(position).orElseThrow(() -> new Exception("Current position is not covered by any region"));
+  public Nucleotide getNucleotideAt(int position) {
+    Interval interval = listOfIntervals.getIntervalByPosition(position).orElseThrow(() -> new RuntimeException("Current position is not covered by any region"));
     final int positionInSubstring = position - interval.getBegin();
     return Nucleotide.fromString(Character.toString(nucleotidesIntervals.get(interval).charAt(positionInSubstring)));
   }

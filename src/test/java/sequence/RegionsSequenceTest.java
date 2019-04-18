@@ -57,7 +57,7 @@ class RegionsSequenceTest {
   }
 
   @Test
-  void getNucleotideAt() throws Exception {
+  void getNucleotideAt() {
     Assertions.assertEquals(Nucleotide.A, regionsSequence.getNucleotideAt(0));
     Assertions.assertEquals(Nucleotide.C, regionsSequence.getNucleotideAt(32));
     Assertions.assertEquals(Nucleotide.G, regionsSequence.getNucleotideAt(14));
