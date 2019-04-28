@@ -3,11 +3,13 @@ package vcfwriter;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import temporarytools.TemporaryTools;
 import vcfwriter.variation.Variation;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -16,19 +18,23 @@ public class TestVcfWriter {
 
   @Test
   public void fileCreate() {
-    try (VcfWriter vcfWriter = new VcfWriter("result.vcf")) {
-      File file = new File("result.vcf");
-      Assertions.assertTrue(Files.exists(file.toPath()));
+    try {
+      Path path = TemporaryTools.tempFile("result", ".vcf");
+      VcfWriter vcfWriter = new VcfWriter(path.toString());
+      Assertions.assertTrue(Files.exists(path));
+      vcfWriter.close();
     }
     catch (IOException e) {
       System.out.println(e.getMessage());
     }
+
   }
 
   @Test
   public void сontainData() {
     try {
-      VcfWriter vcfWriter = new VcfWriter("C:\\Education\\BioScience\\variant_caller\\src\\test\\resources\\result.vcf");
+      Path path = TemporaryTools.tempFile("result", ".vcf");
+      VcfWriter vcfWriter = new VcfWriter(path.toString());
       Variation var1 = new Variation("20", 1444, "G", "A");
       Variation var2 = new Variation("20", 1444, "microsati", "G", "A", "47", "PASS", "NS=3");
       List<Variation> vars = new ArrayList<>();
@@ -36,8 +42,7 @@ public class TestVcfWriter {
       vars.add(var2);
       vcfWriter.writeData(vars);
       vcfWriter.close();
-      File file = new File("C:\\Education\\BioScience\\variant_caller\\src\\test\\resources\\result.vcf");
-      Scanner scanner = new Scanner(file);
+      Scanner scanner = new Scanner(path.toFile());
       Assertions.assertTrue(scanner.next().equals("20"));
       Assertions.assertTrue(scanner.nextInt() == 1444);
       Assertions.assertTrue(scanner.next().equals("."));
@@ -61,11 +66,11 @@ public class TestVcfWriter {
   @Test
   public void containHeaders() {
     try {
-      VcfWriter vcfWriter = new VcfWriter("C:\\Education\\BioScience\\variant_caller\\src\\test\\resources\\result.vcf");
+      Path path = TemporaryTools.tempFile("result", ".vcf");
+      VcfWriter vcfWriter = new VcfWriter(path.toString());
       vcfWriter.writeHeadersOfData();
       vcfWriter.close();
-      File file = new File("C:\\Education\\BioScience\\variant_caller\\src\\test\\resources\\result.vcf");
-      Scanner scanner = new Scanner(file);
+      Scanner scanner = new Scanner(path.toFile());
       Assertions.assertTrue(scanner.next().equals("#CHROM"));
       Assertions.assertTrue(scanner.next().equals("POS"));
       Assertions.assertTrue(scanner.next().equals("ID"));
@@ -86,3 +91,4 @@ public class TestVcfWriter {
 
 
 }
+
