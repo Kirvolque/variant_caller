@@ -1,14 +1,20 @@
 package sequence;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class SamRecord {
   private static final String DOUBLE_SPACE = "  ";
   private static final String SINGLE_SPACE = " ";
   private static final List<String> HEADER_TAGS =
       new ArrayList<>(Arrays.asList("@HD", "@SQ", "@RG", "@PG", "@CO"));
+
+  private static final Pattern cigarPattern =
+      Pattern.compile("[0-9]*[D|M|I|X]", Pattern.CASE_INSENSITIVE);
+  private static final Pattern cigarLetterPattern =
+      Pattern.compile("[D|M|I|X]", Pattern.CASE_INSENSITIVE);
 
   private boolean isHeader;
   private String rname; // Reference sequence NAME
@@ -17,6 +23,9 @@ public class SamRecord {
   private String cigar; // CIGAR String
   private String seq; // segment SEQuence
   private String qual; // ASCII of Phred-scaled base QUALity+33
+
+  private static int samIndex = 0;
+  private static int fastaIndex = 0;
 
   private SamRecord(
       String rname, int pos, int mapq, String cigar, String seq, String qual, boolean isHeader) {
@@ -53,6 +62,38 @@ public class SamRecord {
 
   public boolean isHeader() {
     return isHeader;
+  }
+
+  private static void cigarPairChecker(Map.Entry<Integer, Character> cigarPair) {
+    switch (cigarPair.getValue()) {
+      case 'D':
+        fastaIndex += cigarPair.getKey();
+        break;
+      case 'M':
+        samIndex += cigarPair.getKey();
+        fastaIndex += cigarPair.getKey();
+        break;
+      case 'I':
+        samIndex += cigarPair.getKey();
+        break;
+      default:
+        break;
+    }
+  }
+
+  public Stream<Map.Entry<Integer, Character>> getCigarStream() {
+    Matcher matcher = cigarPattern.matcher(cigar);
+    final Stream.Builder<Map.Entry<Integer, Character>> sb = Stream.builder();
+
+    while (matcher.find()) {
+      Matcher letterMatch = cigarLetterPattern.matcher(matcher.group());
+      if (letterMatch.find()) {
+        Character character = letterMatch.group().charAt(0);
+        Integer number = Integer.valueOf(matcher.group().substring(0, letterMatch.start()));
+        sb.add(new AbstractMap.SimpleEntry<>(number, character));
+      }
+    }
+    return sb.build().peek(SamRecord::cigarPairChecker);
   }
 
   public String getRname() {
