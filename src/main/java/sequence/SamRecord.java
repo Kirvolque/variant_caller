@@ -1,5 +1,9 @@
 package sequence;
 
+import fastaparser.FastaParser;
+import vcfwriter.variation.Variation;
+
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,7 +19,8 @@ public class SamRecord {
       Pattern.compile("[0-9]*[D|M|I|X]", Pattern.CASE_INSENSITIVE);
   private static final Pattern cigarLetterPattern =
       Pattern.compile("[D|M|I|X]", Pattern.CASE_INSENSITIVE);
-
+  private static int samIndex = 0;
+  private static int fastaIndex = 0;
   private boolean isHeader;
   private String rname; // Reference sequence NAME
   private int pos; // 	1- based leftmost mapping POSition
@@ -23,9 +28,6 @@ public class SamRecord {
   private String cigar; // CIGAR String
   private String seq; // segment SEQuence
   private String qual; // ASCII of Phred-scaled base QUALity+33
-
-  private static int samIndex = 0;
-  private static int fastaIndex = 0;
 
   private SamRecord(
       String rname, int pos, int mapq, String cigar, String seq, String qual, boolean isHeader) {
@@ -60,10 +62,6 @@ public class SamRecord {
     return SamRecord.initFromStringArray(subStr, HEADER_TAGS.contains(subStr[0]));
   }
 
-  public boolean isHeader() {
-    return isHeader;
-  }
-
   private static void cigarPairChecker(Map.Entry<Integer, Character> cigarPair) {
     switch (cigarPair.getValue()) {
       case 'D':
@@ -81,6 +79,10 @@ public class SamRecord {
     }
   }
 
+  public boolean isHeader() {
+    return isHeader;
+  }
+
   public Stream<Map.Entry<Integer, Character>> getCigarStream() {
     Matcher matcher = cigarPattern.matcher(cigar);
     final Stream.Builder<Map.Entry<Integer, Character>> sb = Stream.builder();
@@ -94,6 +96,19 @@ public class SamRecord {
       }
     }
     return sb.build().peek(SamRecord::cigarPairChecker);
+  }
+
+  public Stream<Variation> getVariationStream() throws IOException {
+    FastaSequence fastaSequence = FastaParser.parseFasta("ex.fa");
+    return getCigarStream()
+        .flatMap(
+            o ->
+                Stream.of(
+                    new Variation(
+                        String.valueOf(fastaIndex),
+                        samIndex,
+                        fastaSequence.getNucleotide(rname, fastaIndex).toString(),
+                        seq.substring(samIndex, samIndex + 1))));
   }
 
   public String getRname() {
