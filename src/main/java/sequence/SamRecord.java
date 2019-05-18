@@ -105,8 +105,8 @@ public class SamRecord {
             o ->
                 Stream.of(
                     new Variation(
-                        String.valueOf(fastaIndex),
-                        samIndex,
+                        rname,
+                        fastaIndex,
                         fastaSequence.getNucleotide(rname, fastaIndex).toString(),
                         seq.substring(samIndex, samIndex + 1))));
   }
