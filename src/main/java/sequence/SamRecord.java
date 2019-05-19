@@ -1,9 +1,5 @@
 package sequence;
 
-import fastaparser.FastaParser;
-import vcfwriter.variation.Variation;
-
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,11 +15,10 @@ public class SamRecord {
       Pattern.compile("[0-9]*[D|M|I|X]", Pattern.CASE_INSENSITIVE);
   private static final Pattern cigarLetterPattern =
       Pattern.compile("[D|M|I|X]", Pattern.CASE_INSENSITIVE);
-  private static int samIndex = 0;
-  private static int fastaIndex = 0;
+
   private boolean isHeader;
   private String rname; // Reference sequence NAME
-  private int pos; // 	1- based leftmost mapping POSition
+  private int pos; // 1- based leftmost mapping POSition
   private int mapq; // MAPping Quality
   private String cigar; // CIGAR String
   private String seq; // segment SEQuence
@@ -62,23 +57,6 @@ public class SamRecord {
     return SamRecord.initFromStringArray(subStr, HEADER_TAGS.contains(subStr[0]));
   }
 
-  private static void cigarPairChecker(Map.Entry<Integer, Character> cigarPair) {
-    switch (cigarPair.getValue()) {
-      case 'D':
-        fastaIndex += cigarPair.getKey();
-        break;
-      case 'M':
-        samIndex += cigarPair.getKey();
-        fastaIndex += cigarPair.getKey();
-        break;
-      case 'I':
-        samIndex += cigarPair.getKey();
-        break;
-      default:
-        break;
-    }
-  }
-
   public boolean isHeader() {
     return isHeader;
   }
@@ -95,20 +73,7 @@ public class SamRecord {
         sb.add(new AbstractMap.SimpleEntry<>(number, character));
       }
     }
-    return sb.build().peek(SamRecord::cigarPairChecker);
-  }
-
-  public Stream<Variation> getVariationStream() throws IOException {
-    FastaSequence fastaSequence = FastaParser.parseFasta("ex.fa");
-    return getCigarStream()
-        .flatMap(
-            o ->
-                Stream.of(
-                    new Variation(
-                        rname,
-                        fastaIndex,
-                        fastaSequence.getNucleotide(rname, fastaIndex).toString(),
-                        seq.substring(samIndex, samIndex + 1))));
+    return sb.build();
   }
 
   public String getRname() {
