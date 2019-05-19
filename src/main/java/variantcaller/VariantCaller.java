@@ -14,7 +14,7 @@ public class VariantCaller {
 
   private Map<Variation, Integer> alleleDepth = new HashMap<>();
 
-  private static void cigarPairChecker(Map.Entry<Integer, Character> cigarPair) {
+  private static void incrementPositions(Map.Entry<Integer, Character> cigarPair) {
     switch (cigarPair.getValue()) {
       case 'D':
         fastaIndex += cigarPair.getKey();
@@ -31,26 +31,30 @@ public class VariantCaller {
     }
   }
 
+  private void incrementAlleleDepth(SamRecord samRecord, FastaSequence fastaSequence) {
+    alleleDepth.merge(
+        new Variation(
+            samRecord.getRname(),
+            fastaIndex,
+            fastaSequence.getNucleotide(samRecord.getRname(), fastaIndex).toString(),
+            samRecord.getSeq().substring(samIndex, samIndex + 1)),
+        1,
+        Integer::sum);
+  }
+
+  private void processSamRecord(SamRecord samRecord, FastaSequence fastaSequence) {
+    samRecord
+        .getCigarStream()
+        .peek(VariantCaller::incrementPositions)
+        .forEach(cigarPair -> incrementAlleleDepth(samRecord, fastaSequence));
+  }
+
   public void processSamRecords(FastaSequence fastaSequence, Stream<SamRecord> samRecordStream) {
     samRecordStream.forEach(
         samRecord -> {
           samIndex = 0;
           fastaIndex = 0;
-          samRecord
-              .getCigarStream()
-              .peek(VariantCaller::cigarPairChecker)
-              .forEach(
-                  o ->
-                      alleleDepth.merge(
-                          new Variation(
-                              samRecord.getRname(),
-                              fastaIndex,
-                              fastaSequence
-                                  .getNucleotide(samRecord.getRname(), fastaIndex)
-                                  .toString(),
-                              samRecord.getSeq().substring(samIndex, samIndex + 1)),
-                          1,
-                          Integer::sum));
+          processSamRecord(samRecord, fastaSequence);
         });
   }
 }
