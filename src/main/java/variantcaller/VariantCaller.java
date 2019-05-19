@@ -4,12 +4,15 @@ import sequence.FastaSequence;
 import sequence.SamRecord;
 import vcfwriter.variation.Variation;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
 public class VariantCaller {
   private static int samIndex = 0;
   private static int fastaIndex = 0;
+
+  private Map<Variation, Integer> alleleDepth = new HashMap<>();
 
   private static void cigarPairChecker(Map.Entry<Integer, Character> cigarPair) {
     switch (cigarPair.getValue()) {
@@ -28,23 +31,23 @@ public class VariantCaller {
     }
   }
 
-  public static Stream<Stream<Variation>> getVariationStream(
-      FastaSequence fastaSequence, Stream<SamRecord> samRecordStream) {
-    return samRecordStream.flatMap(
+  public void processSamRecords(FastaSequence fastaSequence, Stream<SamRecord> samRecordStream) {
+    samRecordStream.forEach(
         samRecord ->
-            Stream.of(
-                samRecord
-                    .getCigarStream()
-                    .peek(VariantCaller::cigarPairChecker)
-                    .flatMap(
-                        o ->
-                            Stream.of(
-                                new Variation(
-                                    samRecord.getRname(),
-                                    fastaIndex,
-                                    fastaSequence
-                                        .getNucleotide(samRecord.getRname(), fastaIndex)
-                                        .toString(),
-                                    samRecord.getSeq().substring(samIndex, samIndex + 1))))));
+            samRecord
+                .getCigarStream()
+                .peek(VariantCaller::cigarPairChecker)
+                .forEach(
+                    o ->
+                        alleleDepth.merge(
+                            new Variation(
+                                samRecord.getRname(),
+                                fastaIndex,
+                                fastaSequence
+                                    .getNucleotide(samRecord.getRname(), fastaIndex)
+                                    .toString(),
+                                samRecord.getSeq().substring(samIndex, samIndex + 1)),
+                            1,
+                            Integer::sum)));
   }
 }
