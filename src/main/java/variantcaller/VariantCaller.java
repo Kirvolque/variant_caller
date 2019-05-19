@@ -33,21 +33,24 @@ public class VariantCaller {
 
   public void processSamRecords(FastaSequence fastaSequence, Stream<SamRecord> samRecordStream) {
     samRecordStream.forEach(
-        samRecord ->
-            samRecord
-                .getCigarStream()
-                .peek(VariantCaller::cigarPairChecker)
-                .forEach(
-                    o ->
-                        alleleDepth.merge(
-                            new Variation(
-                                samRecord.getRname(),
-                                fastaIndex,
-                                fastaSequence
-                                    .getNucleotide(samRecord.getRname(), fastaIndex)
-                                    .toString(),
-                                samRecord.getSeq().substring(samIndex, samIndex + 1)),
-                            1,
-                            Integer::sum)));
+        samRecord -> {
+          samIndex = 0;
+          fastaIndex = 0;
+          samRecord
+              .getCigarStream()
+              .peek(VariantCaller::cigarPairChecker)
+              .forEach(
+                  o ->
+                      alleleDepth.merge(
+                          new Variation(
+                              samRecord.getRname(),
+                              fastaIndex,
+                              fastaSequence
+                                  .getNucleotide(samRecord.getRname(), fastaIndex)
+                                  .toString(),
+                              samRecord.getSeq().substring(samIndex, samIndex + 1)),
+                          1,
+                          Integer::sum));
+        });
   }
 }
