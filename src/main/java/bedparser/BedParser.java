@@ -19,10 +19,10 @@ public class BedParser {
     try (Stream<String> s = Files.lines(filePath)) {
       s.map(BedRecord::init)
           .forEach(
-              person ->
+              bedRecord ->
                   collectedMap
-                      .computeIfAbsent(person.getChrom(), key -> new ArrayList<>())
-                      .add(person.getInterval()));
+                      .computeIfAbsent(bedRecord.getChrom(), key -> new ArrayList<>())
+                      .add(bedRecord.getInterval()));
     }
     return collectedMap;
   }
