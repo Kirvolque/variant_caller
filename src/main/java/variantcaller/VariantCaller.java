@@ -38,6 +38,9 @@ public class VariantCaller {
     }
   }
 
+  public void getAlleleFrequency(Double minAlleleFrequency) {
+  }
+
   private void incrementAlleleDepth(SamRecord samRecord, FastaSequence fastaSequence) {
     StringBuilder refBuilder = new StringBuilder();
     for (int i = prevFastaIndex; i < fastaIndex; i++) {

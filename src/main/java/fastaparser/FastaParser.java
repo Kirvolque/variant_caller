@@ -7,7 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +22,7 @@ public class FastaParser {
    * @return instance of FastaSequence represents data from the file
    * @throws IOException if there is no file with such path
    */
-  public static FastaSequence parseFasta(String fileName, String pathToBedFile) throws IOException {
+  public static FastaSequence parseFasta(String fileName, Path pathToBedFile) throws IOException {
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(
         new FileInputStream(fileName), StandardCharsets.UTF_8))) {
       StringBuilder currentSequence = new StringBuilder();
@@ -49,7 +49,7 @@ public class FastaParser {
       }
       fastaData.put(currentSequenceName, currentSequence.toString());
 
-      return FastaSequence.init(fastaData, Paths.get(pathToBedFile));
+      return FastaSequence.init(fastaData, pathToBedFile);
     }
   }
 }
