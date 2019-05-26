@@ -53,13 +53,13 @@ public class VariantCaller {
     }
   }
 
-  private void incrementTotalDepth(SamRecord samRecord) {
-    int largestIndex = Math.max(prevFastaIndex, prevSamIndex);
-    int shortestString = Math.min(fastaIndex - prevFastaIndex, samIndex - prevSamIndex);
-    for (int i = 0; i < shortestString; i++) {
-      totalDepth
-          .computeIfAbsent(samRecord.getRname(), key -> new HashMap<>())
-          .merge(largestIndex + i, 1, Integer::sum);
+  private void incrementTotalDepth(SamRecord samRecord, Character cigarLetter) {
+    if (cigarLetter.equals('M')) {
+      for (int i = prevSamIndex; i < samIndex; i++) {
+        totalDepth
+            .computeIfAbsent(samRecord.getRname(), key -> new HashMap<>())
+            .merge(i, 1, Integer::sum);
+      }
     }
   }
 
@@ -70,17 +70,17 @@ public class VariantCaller {
         .forEach(
             cigarPair -> {
               incrementAlleleDepth(samRecord, fastaSequence);
-              incrementTotalDepth(samRecord);
+              incrementTotalDepth(samRecord, cigarPair.getValue());
             });
   }
 
   public void processSamRecords(FastaSequence fastaSequence, Stream<SamRecord> samRecordStream) {
     samRecordStream.forEach(
         samRecord -> {
-          prevSamIndex = 0;
-          prevFastaIndex = 0;
-          samIndex = 0;
-          fastaIndex = 0;
+          prevSamIndex = samRecord.getPos() - 1;
+          prevFastaIndex = samRecord.getPos() - 1;
+          samIndex = samRecord.getPos() - 1;
+          fastaIndex = samRecord.getPos() - 1;
           processSamRecord(samRecord, fastaSequence);
         });
   }
