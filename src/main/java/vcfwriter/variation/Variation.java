@@ -1,8 +1,9 @@
 package vcfwriter.variation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class Variation {
 
@@ -21,7 +22,15 @@ public class Variation {
     this(chrom, pos, ".", ref, alt, ".", ".", ".");
   }
 
-  public Variation(String chrom, int pos, String id, String ref, String alt, String qual, String filter, String info) {
+  public Variation(
+      String chrom,
+      int pos,
+      String id,
+      String ref,
+      String alt,
+      String qual,
+      String filter,
+      String info) {
     this.chrom = chrom;
     this.pos = pos;
     this.id = id;
@@ -40,6 +49,30 @@ public class Variation {
 
   public String toVcfLine() {
     return String.format("%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s", chrom, pos, id, ref, alt, qual, filter, info);
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    final Variation variation = (Variation) o;
+    return pos == variation.pos
+        && chrom.equals(variation.chrom)
+        && ref.equals(variation.ref)
+        && alt.equals(variation.alt);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(chrom, pos, ref, alt);
+  }
+
+  public List<String> getFieldList() {
+    return Arrays.asList(chrom, String.valueOf(pos), id, ref, alt, qual, filter, info);
+  }
+
+  public String toVcfLine() {
+    return String.format(
+        "%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s", chrom, pos, id, ref, alt, qual, filter, info);
   }
 
   public String getChrom() {
