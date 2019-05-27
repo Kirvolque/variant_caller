@@ -118,7 +118,7 @@ public class CmdParser {
     variantCaller.processSamRecords(fastaSequence, SamParser.parseSam(samFilePath));
     VcfWriter vcfWriter = new VcfWriter(vcfFilePath);
     vcfWriter.writeHeadersOfData();
-    vcfWriter.writeData(variantCaller.getAlleleFrequency(minAlleleFrequency));
+    vcfWriter.writeData(variantCaller.filterVariations(minAlleleFrequency));
     vcfWriter.close();
   }
 

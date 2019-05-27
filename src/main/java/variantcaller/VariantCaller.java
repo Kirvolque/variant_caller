@@ -4,10 +4,10 @@ import sequence.FastaSequence;
 import sequence.SamRecord;
 import vcfwriter.variation.Variation;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class VariantCaller {
@@ -40,19 +40,19 @@ public class VariantCaller {
     }
   }
 
-  public List<Variation> getAlleleFrequency(Double minAlleleFrequency) {
-    List<Variation> filteredVariations = new ArrayList<>();
-    for (Map.Entry alleleDepthPair : alleleDepth.entrySet()) {
-      String chromName = ((Variation) alleleDepthPair.getKey()).getChrom();
-      int chromPos = ((Variation) alleleDepthPair.getKey()).getPos();
-      Double ad = ((Integer) alleleDepthPair.getValue()).doubleValue();
-      Double td = Double.valueOf(totalDepth.get(chromName).get(chromPos));
-      Double af = ad / td;
-      if (!af.isNaN() && af >= minAlleleFrequency) {
-        filteredVariations.add((Variation) alleleDepthPair.getKey());
-      }
-    }
-    return filteredVariations;
+  private Double countAF(Map.Entry<Variation, Integer> alleleDepthPair) {
+    String chromName = alleleDepthPair.getKey().getChrom();
+    int chromPos = alleleDepthPair.getKey().getPos();
+    Double ad = alleleDepthPair.getValue().doubleValue();
+    Double td = Double.valueOf(totalDepth.get(chromName).get(chromPos));
+    return ad / td;
+  }
+
+  public List<Variation> filterVariations(Double minAlleleFrequency) {
+    return alleleDepth.entrySet().stream()
+        .filter(x -> countAF(x) >= minAlleleFrequency)
+        .map(x -> x.getKey())
+        .collect(Collectors.toList());
   }
 
   private void incrementAlleleDepth(SamRecord samRecord, FastaSequence fastaSequence) {
