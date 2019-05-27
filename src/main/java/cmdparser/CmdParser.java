@@ -5,6 +5,7 @@ import org.apache.commons.cli.*;
 import samparser.SamParser;
 import sequence.FastaSequence;
 import variantcaller.VariantCaller;
+import vcfwriter.VcfWriter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -133,7 +134,8 @@ public class CmdParser {
     FastaSequence fastaSequence = FastaParser.parseFasta(fastaFilePath, bedFilePath);
     VariantCaller variantCaller = new VariantCaller();
     variantCaller.processSamRecords(fastaSequence, SamParser.parseSam(samFilePath));
-    variantCaller.getAlleleFrequency(minAlleleFrequency);
+    VcfWriter vcfWriter = new VcfWriter(vcfFilePath);
+    vcfWriter.writeData(variantCaller.getAlleleFrequency(minAlleleFrequency));
   }
 
   public static void main(final String... args) {

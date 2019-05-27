@@ -4,7 +4,9 @@ import sequence.FastaSequence;
 import sequence.SamRecord;
 import vcfwriter.variation.Variation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -38,7 +40,17 @@ public class VariantCaller {
     }
   }
 
-  public void getAlleleFrequency(Double minAlleleFrequency) {
+  public List<Variation> getAlleleFrequency(Double minAlleleFrequency) {
+    List<Variation> filteredVariations = new ArrayList<>();
+    for (Map.Entry alleleDepthPair : alleleDepth.entrySet()) {
+      String chromName = ((Variation) alleleDepthPair.getKey()).getChrom();
+      String chromPos = ((Variation) alleleDepthPair.getKey()).getAlt();
+      Double af = ((Double) alleleDepthPair.getValue() / totalDepth.get(chromName).get(chromPos));
+      if (!af.isNaN() && af >= minAlleleFrequency) {
+        filteredVariations.add((Variation) alleleDepthPair.getValue());
+      }
+    }
+    return filteredVariations;
   }
 
   private void incrementAlleleDepth(SamRecord samRecord, FastaSequence fastaSequence) {
