@@ -51,7 +51,7 @@ public class VariantCaller {
   public List<Variation> filterVariations(Double minAlleleFrequency) {
     return alleleDepth.entrySet().stream()
         .filter(x -> countAF(x) >= minAlleleFrequency)
-        .map(x -> x.getKey())
+        .map(Map.Entry::getKey)
         .collect(Collectors.toList());
   }
 
