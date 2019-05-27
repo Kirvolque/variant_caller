@@ -15,7 +15,7 @@ public class BedRecord {
   public static BedRecord init(String line) {
     // replace 2 spaces with 1 to avoid wrong line splitting
     line = line.replace(DOUBLE_SPACE, SINGLE_SPACE);
-    String[] subStr = line.split(" ");
+    String[] subStr = line.split(SINGLE_SPACE);
     if (subStr.length > 2 || !subStr[0].equals("track")) {
       return new BedRecord(subStr[0], new Interval(Integer.valueOf(subStr[1]), Integer.valueOf(subStr[2])));
     } else {

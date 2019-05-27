@@ -5,7 +5,9 @@ import sequence.SamRecord;
 import vcfwriter.variation.Variation;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class VariantCaller {
@@ -38,7 +40,19 @@ public class VariantCaller {
     }
   }
 
-  public void getAlleleFrequency(Double minAlleleFrequency) {
+  private Double countAF(Map.Entry<Variation, Integer> alleleDepthPair) {
+    String chromName = alleleDepthPair.getKey().getChrom();
+    int chromPos = alleleDepthPair.getKey().getPos();
+    Double ad = alleleDepthPair.getValue().doubleValue();
+    Double td = Double.valueOf(totalDepth.get(chromName).get(chromPos));
+    return ad / td;
+  }
+
+  public List<Variation> filterVariations(Double minAlleleFrequency) {
+    return alleleDepth.entrySet().stream()
+        .filter(x -> countAF(x) >= minAlleleFrequency)
+        .map(Map.Entry::getKey)
+        .collect(Collectors.toList());
   }
 
   private void incrementAlleleDepth(SamRecord samRecord, FastaSequence fastaSequence) {
@@ -48,7 +62,10 @@ public class VariantCaller {
     }
 
     String ref = refBuilder.toString();
-    String alt = samRecord.getSeq().substring(prevSamIndex, samIndex);
+    String alt =
+        samRecord
+            .getSeq()
+            .substring(prevSamIndex - samRecord.getPos(), samIndex - samRecord.getPos());
 
     if (!ref.equals(alt)) {
       alleleDepth.merge(
@@ -58,7 +75,7 @@ public class VariantCaller {
 
   private void incrementTotalDepth(SamRecord samRecord, Character cigarLetter) {
     if (cigarLetter.equals('M')) {
-      for (int i = prevSamIndex; i < samIndex; i++) {
+      for (int i = prevFastaIndex; i < fastaIndex; i++) {
         totalDepth
             .computeIfAbsent(samRecord.getRname(), key -> new HashMap<>())
             .merge(i, 1, Integer::sum);
@@ -80,9 +97,9 @@ public class VariantCaller {
   public void processSamRecords(FastaSequence fastaSequence, Stream<SamRecord> samRecordStream) {
     samRecordStream.forEach(
         samRecord -> {
-          prevSamIndex = samRecord.getPos() - 1;
+          prevSamIndex = samRecord.getPos();
           prevFastaIndex = samRecord.getPos() - 1;
-          samIndex = samRecord.getPos() - 1;
+          samIndex = samRecord.getPos();
           fastaIndex = samRecord.getPos() - 1;
           processSamRecord(samRecord, fastaSequence);
         });

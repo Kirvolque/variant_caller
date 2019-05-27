@@ -5,6 +5,7 @@ import org.apache.commons.cli.*;
 import samparser.SamParser;
 import sequence.FastaSequence;
 import variantcaller.VariantCaller;
+import vcfwriter.VcfWriter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,43 +21,23 @@ public class CmdParser {
   private static String vcfFilePath;
   private static Double minAlleleFrequency;
 
-  public static String getFastaFilePath() {
-    return fastaFilePath;
-  }
-
-  public static void setFastaFilePath(String fastaFilePath) {
+  private static void setFastaFilePath(String fastaFilePath) {
     CmdParser.fastaFilePath = fastaFilePath;
   }
 
-  public static Path getSamFilePath() {
-    return samFilePath;
-  }
-
-  public static void setSamFilePath(Path samFilePath) {
+  private static void setSamFilePath(Path samFilePath) {
     CmdParser.samFilePath = samFilePath;
   }
 
-  public static Path getBedFilePath() {
-    return bedFilePath;
-  }
-
-  public static void setBedFilePath(Path bedFilePath) {
+  private static void setBedFilePath(Path bedFilePath) {
     CmdParser.bedFilePath = bedFilePath;
   }
 
-  public static String getVcfFilePath() {
-    return vcfFilePath;
-  }
-
-  public static void setVcfFilePath(String vcfFilePath) {
+  private static void setVcfFilePath(String vcfFilePath) {
     CmdParser.vcfFilePath = vcfFilePath;
   }
 
-  public static Double getMinAlleleFrequency() {
-    return minAlleleFrequency;
-  }
-
-  public static void setMinAlleleFrequency(Double minAlleleFrequency) {
+  private static void setMinAlleleFrequency(Double minAlleleFrequency) {
     CmdParser.minAlleleFrequency = minAlleleFrequency;
   }
 
@@ -101,14 +82,15 @@ public class CmdParser {
 
     if (line.hasOption("help")) {
       printHelp(options, 80, "Options", "-- HELP --", 3, 5, true, System.out);
+      return;
     }
     if (line.hasOption("sam")
         && line.hasOption("fasta")
         && line.hasOption("bed")
         && line.hasOption("af")
         && line.hasOption("output")) {
-      String fastaFilePath = line.getOptionValue("sam", null);
-      String samFilePath = line.getOptionValue("fasta", null);
+      String fastaFilePath = line.getOptionValue("fasta", null);
+      String samFilePath = line.getOptionValue("sam", null);
       String bedFilePath = line.getOptionValue("bed", null);
       String vcfFilePath = line.getOptionValue("output", null);
       Double minAlleleFrequency = Double.parseDouble(line.getOptionValue("af", null));
@@ -122,9 +104,10 @@ public class CmdParser {
       } else {
         setFastaFilePath(fastaFilePath);
         setSamFilePath(Paths.get(samFilePath));
-        setBedFilePath(Paths.get(samFilePath));
+        setBedFilePath(Paths.get(bedFilePath));
         setVcfFilePath(vcfFilePath);
         setMinAlleleFrequency(minAlleleFrequency);
+        work();
       }
     }
   }
@@ -133,13 +116,15 @@ public class CmdParser {
     FastaSequence fastaSequence = FastaParser.parseFasta(fastaFilePath, bedFilePath);
     VariantCaller variantCaller = new VariantCaller();
     variantCaller.processSamRecords(fastaSequence, SamParser.parseSam(samFilePath));
-    variantCaller.getAlleleFrequency(minAlleleFrequency);
+    VcfWriter vcfWriter = new VcfWriter(vcfFilePath);
+    vcfWriter.writeHeadersOfData();
+    vcfWriter.writeData(variantCaller.filterVariations(minAlleleFrequency));
+    vcfWriter.close();
   }
 
   public static void main(final String... args) {
     try {
       parse(args);
-      work();
     } catch (ParseException exp) {
       System.out.println("Unexpected exception:" + exp.getMessage());
     } catch (IOException ioExp) {
