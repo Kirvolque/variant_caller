@@ -8,7 +8,7 @@ import sequence.FastaSequence;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 class FastaParserTest {
@@ -30,7 +30,7 @@ class FastaParserTest {
             Objects.requireNonNull(
                 FastaParserTest.class.getClassLoader().getResource(FASTA_FILE_NAME))
                 .getPath(),
-            Path.of(
+            Paths.get(
                 Objects.requireNonNull(
                     FastaParserTest.class.getClassLoader().getResource(BED_FILE_NAME))
                     .toURI()));
@@ -44,10 +44,10 @@ class FastaParserTest {
         () ->
             FastaParser.parseFasta(
                 "i_dont_exist.fa",
-                Path.of(
+                Paths.get(
                     Objects.requireNonNull(
                         FastaParserTest.class.getClassLoader().getResource(BED_FILE_NAME))
-                        .getPath())));
+                        .toURI())));
   }
 
   @Test

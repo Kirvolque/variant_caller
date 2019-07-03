@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -34,7 +34,7 @@ class FastaSequenceTest {
     fastaSequence =
         FastaSequence.init(
             fastaData,
-            Path.of(
+            Paths.get(
                 Objects.requireNonNull(
                     FastaSequenceTest.class.getClassLoader().getResource(BED_FILE_NAME))
                     .getPath()));
