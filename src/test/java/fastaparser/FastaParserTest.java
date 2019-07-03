@@ -7,28 +7,47 @@ import org.junit.jupiter.api.Test;
 import sequence.FastaSequence;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.Objects;
 
-
 class FastaParserTest {
-  private static final String FILE_NAME = "ex.fa";
+  private static final String FASTA_FILE_NAME = "ex.fa";
+  private static final String BED_FILE_NAME = "ex.bed";
   private static final String CHROMOSOME_NAME_1 = "ref";
   private static final String CHROMOSOME_NAME_2 = "ref2";
-  private static final String CHROMOSOME_SEQUENCE_1 = "AGCATGTTAGATAAGATAGCTGTGCTAGTAGGCAGTCAGCGCCATE";
+  private static final String CHROMOSOME_SEQUENCE_1 =
+      "AGCATGTTAGATAAGATAGCTGTGCTAGTAGGCAGTCAGCGCCATE";
   private static final String CHROMOSOME_SEQUENCE_2 = "aggttttataaaacaattaagtctacagagcaactacgcge";
 
   private static FastaSequence fastaSequence;
 
   @BeforeAll
   @DisplayName("Init fastaParser")
-  static void initFastaParser() throws IOException {
-    fastaSequence = FastaParser.parseFasta(Objects.requireNonNull(FastaParserTest.class.getClassLoader().getResource(FILE_NAME)).getPath());
+  static void initFastaParser() throws IOException, URISyntaxException {
+    fastaSequence =
+        FastaParser.parseFasta(
+            Objects.requireNonNull(
+                FastaParserTest.class.getClassLoader().getResource(FASTA_FILE_NAME))
+                .getPath(),
+            Path.of(
+                Objects.requireNonNull(
+                    FastaParserTest.class.getClassLoader().getResource(BED_FILE_NAME))
+                    .toURI()));
   }
 
   @Test
-  @DisplayName("Parse unexciting file")
-  void parseUnexcitingFile() {
-    Assertions.assertThrows(IOException.class, () -> FastaParser.parseFasta("i_dont_exist.fa"));
+  @DisplayName("Parse unexciting fasta file")
+  void parseUnexcitingFastaFile() {
+    Assertions.assertThrows(
+        IOException.class,
+        () ->
+            FastaParser.parseFasta(
+                "i_dont_exist.fa",
+                Path.of(
+                    Objects.requireNonNull(
+                        FastaParserTest.class.getClassLoader().getResource(BED_FILE_NAME))
+                        .getPath())));
   }
 
   @Test
