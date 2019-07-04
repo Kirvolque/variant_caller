@@ -14,11 +14,8 @@ import java.util.Objects;
 class FastaParserTest {
   private static final String FASTA_FILE_NAME = "ex.fa";
   private static final String BED_FILE_NAME = "ex.bed";
-  private static final String CHROMOSOME_NAME_1 = "ref";
-  private static final String CHROMOSOME_NAME_2 = "ref2";
-  private static final String CHROMOSOME_SEQUENCE_1 =
-      "AGCATGTTAGATAAGATAGCTGTGCTAGTAGGCAGTCAGCGCCATE";
-  private static final String CHROMOSOME_SEQUENCE_2 = "aggttttataaaacaattaagtctacagagcaactacgcge";
+  private static final String CHROMOSOME_NAME_1 = "chr1";
+  private static final String CHROMOSOME_NAME_2 = "chr1";
 
   private static FastaSequence fastaSequence;
 
@@ -55,12 +52,5 @@ class FastaParserTest {
   void checkParsedSequenceNames() {
     Assertions.assertTrue(fastaSequence.getChromosomes().contains(CHROMOSOME_NAME_1));
     Assertions.assertTrue(fastaSequence.getChromosomes().contains(CHROMOSOME_NAME_2));
-  }
-
-  @Test
-  @DisplayName("Check correctness of the parsed sequences")
-  void checkParsedSequences() {
-    Assertions.assertEquals(CHROMOSOME_SEQUENCE_1, fastaSequence.getSequence(CHROMOSOME_NAME_1));
-    Assertions.assertEquals(CHROMOSOME_SEQUENCE_2, fastaSequence.getSequence(CHROMOSOME_NAME_2));
   }
 }

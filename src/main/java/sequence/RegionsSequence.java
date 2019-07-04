@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class RegionsSequence {
-  private static ListOfIntervals listOfIntervals;
-  private static Map<Interval, String> nucleotidesIntervals;
+  private ListOfIntervals listOfIntervals;
+  private Map<Interval, String> nucleotidesIntervals;
 
   /**
    * Private constructor.
@@ -15,8 +15,8 @@ public class RegionsSequence {
    * @param nucleotidesIntervals map with intervals and nucleotide substrings in each interval
    */
   private RegionsSequence(ListOfIntervals listOfIntervals, Map<Interval, String> nucleotidesIntervals) {
-    RegionsSequence.listOfIntervals = listOfIntervals;
-    RegionsSequence.nucleotidesIntervals = nucleotidesIntervals;
+    this.listOfIntervals = listOfIntervals;
+    this.nucleotidesIntervals = nucleotidesIntervals;
   }
 
   /**

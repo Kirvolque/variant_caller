@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +16,8 @@ import java.util.Objects;
 import static java.lang.Integer.MAX_VALUE;
 
 class FastaSequenceTest {
-  private static final String CHROMOSOME_NAME_1 = "ref";
-  private static final String CHROMOSOME_NAME_2 = "ref2";
+  private static final String CHROMOSOME_NAME_1 = "chr1";
+  private static final String CHROMOSOME_NAME_2 = "chr2";
   private static final String BED_FILE_NAME = "ex.bed";
   private static final String CHROMOSOME_SEQUENCE_1 =
       "AGCATGTTAGATAAGATAGCTGTGCTAGTAGGCAGTCAGCGCCATE";
@@ -27,7 +28,7 @@ class FastaSequenceTest {
 
   @BeforeAll
   @DisplayName("Init fastaSequence")
-  static void initFastaParser() throws IOException {
+  static void initFastaParser() throws IOException, URISyntaxException {
     Map<String, String> fastaData = new HashMap<>();
     fastaData.put(CHROMOSOME_NAME_1, CHROMOSOME_SEQUENCE_1);
     fastaData.put(CHROMOSOME_NAME_2, CHROMOSOME_SEQUENCE_2);
@@ -37,22 +38,22 @@ class FastaSequenceTest {
             Paths.get(
                 Objects.requireNonNull(
                     FastaSequenceTest.class.getClassLoader().getResource(BED_FILE_NAME))
-                    .getPath()));
+                    .toURI()));
   }
 
   @Test
   @DisplayName("Bad attempts to get nucleotide")
   void getNonexistentNucleotide() {
     Assertions.assertThrows(
-        IndexOutOfBoundsException.class,
+        RuntimeException.class,
         () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_1, MAX_VALUE));
     Assertions.assertThrows(
-        IndexOutOfBoundsException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_1, -1));
+        RuntimeException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_1, -1));
     Assertions.assertThrows(
-        IndexOutOfBoundsException.class,
+        RuntimeException.class,
         () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_2, MAX_VALUE));
     Assertions.assertThrows(
-        IndexOutOfBoundsException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_2, -1));
+        RuntimeException.class, () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_2, -1));
     Assertions.assertThrows(
         NoSuchElementException.class,
         () -> fastaSequence.getNucleotide(CHROMOSOME_NAME_UNDEFINED, 0));

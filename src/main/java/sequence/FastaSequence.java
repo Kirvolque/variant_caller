@@ -49,7 +49,7 @@ public class FastaSequence {
    * @return RegionsSequence of nucleotides with this chromosome name
    * @throws NoSuchElementException if there is no chromosome with such name
    */
-  public RegionsSequence getSequence(String chromosome) {
+  private RegionsSequence getSequence(String chromosome) {
     if (fastaData.get(chromosome) == null) {
       throw new NoSuchElementException("No such chromosome");
     }
@@ -62,7 +62,7 @@ public class FastaSequence {
    * @param chromosome         name of the chromosome
    * @param nucleotidePosition position of the nucleotide in this chromosome
    * @return nucleotide in this position
-   * @throws IndexOutOfBoundsException if there is no such position in this chromosome
+   * @throws RuntimeException if there is no such position in this chromosome
    */
   public Nucleotide getNucleotide(String chromosome, int nucleotidePosition) {
     return getSequence(chromosome).getNucleotideAt(nucleotidePosition);
