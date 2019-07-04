@@ -16,6 +16,7 @@ dependencies {
     testCompile("org.junit.jupiter:junit-jupiter-api:5.4.1")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.1")
     implementation 'org.apache.commons:commons-lang3:3.9'
+    compile group: 'org.jacoco', name: 'jacoco-maven-plugin', version: '0.8.1'
 }
 
 test {
