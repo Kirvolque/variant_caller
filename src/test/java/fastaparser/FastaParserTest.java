@@ -15,7 +15,7 @@ class FastaParserTest {
   private static final String FASTA_FILE_NAME = "ex.fa";
   private static final String BED_FILE_NAME = "ex.bed";
   private static final String CHROMOSOME_NAME_1 = "chr1";
-  private static final String CHROMOSOME_NAME_2 = "chr1";
+  private static final String CHROMOSOME_NAME_2 = "chr2";
 
   private static FastaSequence fastaSequence;
 
