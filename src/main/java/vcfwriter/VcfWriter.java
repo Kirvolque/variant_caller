@@ -1,20 +1,19 @@
 package vcfwriter;
 
-
-import com.sun.javafx.PlatformUtil;
+import org.apache.commons.lang3.SystemUtils;
 import vcfwriter.variation.Variation;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class VcfWriter implements AutoCloseable{
+public class VcfWriter implements AutoCloseable {
 
+  private static final String HEADER = "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\t";
   private FileWriter fileWriter;
-  private final String HEADER = "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\t";
 
   public VcfWriter(String path) throws IOException {
-   fileWriter = new FileWriter(path);
+    fileWriter = new FileWriter(path);
   }
 
   public void close() throws IOException {
@@ -22,12 +21,11 @@ public class VcfWriter implements AutoCloseable{
   }
 
   public void writeData(List<Variation> data) throws IOException {
-    for (Variation var: data) {
+    for (Variation var : data) {
       fileWriter.write(var.toVcfLine());
-      if (PlatformUtil.isWindows()) {
+      if (SystemUtils.IS_OS_WINDOWS) {
         fileWriter.write("\r\n");
-      }
-      else {
+      } else {
         fileWriter.write("\n");
       }
     }
@@ -35,11 +33,10 @@ public class VcfWriter implements AutoCloseable{
 
   public void writeHeadersOfData() throws IOException {
     fileWriter.write(HEADER);
-    if (PlatformUtil.isWindows()) {
+    if (SystemUtils.IS_OS_WINDOWS) {
       fileWriter.write("\r\n");
     } else {
       fileWriter.write("\n");
     }
   }
-
 }

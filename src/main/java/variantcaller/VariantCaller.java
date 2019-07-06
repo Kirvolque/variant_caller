@@ -11,15 +11,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class VariantCaller {
-  private static int prevSamIndex = 0;
-  private static int prevFastaIndex = 0;
-  private static int samIndex = 0;
-  private static int fastaIndex = 0;
+  private int prevSamIndex = 0;
+  private int prevFastaIndex = 0;
+  private int samIndex = 0;
+  private int fastaIndex = 0;
 
   private Map<Variation, Integer> alleleDepth = new HashMap<>();
   private Map<String, Map<Integer, Integer>> totalDepth = new HashMap<>();
 
-  private static void incrementPositions(Map.Entry<Integer, Character> cigarPair) {
+  private void incrementPositions(Map.Entry<Integer, Character> cigarPair) {
     switch (cigarPair.getValue()) {
       case 'D':
         prevFastaIndex = fastaIndex;
@@ -86,7 +86,7 @@ public class VariantCaller {
   private void processSamRecord(SamRecord samRecord, FastaSequence fastaSequence) {
     samRecord
         .getCigarStream()
-        .peek(VariantCaller::incrementPositions)
+        .peek(this::incrementPositions)
         .forEach(
             cigarPair -> {
               incrementAlleleDepth(samRecord, fastaSequence);

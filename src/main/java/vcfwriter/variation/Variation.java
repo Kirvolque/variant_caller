@@ -1,8 +1,7 @@
 package vcfwriter.variation;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class Variation {
@@ -41,14 +40,6 @@ public class Variation {
     this.info = info;
     this.currentField = 0;
   }
-
-  public List<String> getFieldList() {
-    List<String> fieldList = Arrays.asList(chrom, String.valueOf(pos), id, ref, alt, qual, filter, info);
-    return fieldList;
-  }
-
-  public String toVcfLine() {
-    return String.format("%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s", chrom, pos, id, ref, alt, qual, filter, info);
 
   @Override
   public boolean equals(Object o) {
