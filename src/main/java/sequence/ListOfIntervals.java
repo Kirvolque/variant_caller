@@ -64,4 +64,14 @@ public class ListOfIntervals {
   public Optional<Interval> getIntervalByPosition(int position) {
     return listWithIntervals.stream().filter(i -> i.contains(position)).findFirst();
   }
+
+  /**
+   * Check presence of the interval in the list.
+   *
+   * @param interval interval to be checked
+   * @return true if it is present or false if not
+   */
+  public Boolean checkIntervalsPresence(Interval interval) {
+    return listWithIntervals.contains(interval);
+  }
 }

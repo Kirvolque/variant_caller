@@ -49,6 +49,6 @@ public class FastaSequence {
    * @throws IndexOutOfBoundsException if there is no such position in this chromosome
    */
   public Nucleotide getNucleotide(String chromosome, int nucleotidePosition) {
-    return Nucleotide.fromString(Character.toString(getSequence(chromosome).charAt(nucleotidePosition)));
+    return Nucleotide.fromCharacter(getSequence(chromosome).charAt(nucleotidePosition));
   }
 }

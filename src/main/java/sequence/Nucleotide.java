@@ -1,13 +1,28 @@
 package sequence;
 
-public enum Nucleotide {
-  A, C, G, T, UNDEFINED;
+import java.util.ArrayList;
+import java.util.List;
 
-  public static Nucleotide fromString(String string) {
+public enum Nucleotide {
+  A,
+  C,
+  G,
+  T,
+  UNDEFINED;
+
+  public static Nucleotide fromCharacter(Character character) {
     try {
-      return Nucleotide.valueOf(string.trim().toUpperCase());
+      return Nucleotide.valueOf(String.valueOf(character));
     } catch (IllegalArgumentException | NullPointerException ex) {
     }
     return Nucleotide.UNDEFINED;
+  }
+
+  public static List<Nucleotide> fromString(String string) {
+    List<Nucleotide> result = new ArrayList<>();
+    for (Character c : string.trim().toUpperCase().toCharArray()) {
+      result.add(Nucleotide.fromCharacter(c));
+    }
+    return result;
   }
 }

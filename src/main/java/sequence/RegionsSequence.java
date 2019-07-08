@@ -1,5 +1,6 @@
 package sequence;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -74,6 +75,20 @@ public class RegionsSequence {
   public Nucleotide getNucleotideAt(int position) {
     Interval interval = listOfIntervals.getIntervalByPosition(position).orElseThrow(() -> new RuntimeException("Current position is not covered by any region"));
     final int positionInSubstring = position - interval.getBegin();
-    return Nucleotide.fromString(Character.toString(nucleotidesIntervals.get(interval).charAt(positionInSubstring)));
+    return Nucleotide.fromCharacter(nucleotidesIntervals.get(interval).charAt(positionInSubstring));
+  }
+
+  /**
+   * Returns nucleotide list in the given interval.
+   *
+   * @param interval interval to be found in the nucleotidesIntervals
+   * @return nucleotide list in this interval if it is present
+   * @throws RuntimeException if position is not covered by any region
+   */
+  public List<Nucleotide> getNucleotidesAt(Interval interval) {
+    if (!listOfIntervals.checkIntervalsPresence(interval)) {
+      throw new RuntimeException("Current position is not covered by any region");
+    }
+    return Nucleotide.fromString(nucleotidesIntervals.get(interval));
   }
 }
