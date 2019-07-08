@@ -87,7 +87,7 @@ public class RegionsSequence {
    */
   public List<Nucleotide> getNucleotideAt(Interval interval) {
     if (!listOfIntervals.checkIntervalsPresence(interval)) {
-      throw new RuntimeException("Current position is not covered by any region");
+      throw new RuntimeException("Current interval is not covered by any region");
     }
     return Nucleotide.fromString(nucleotidesIntervals.get(interval));
   }
