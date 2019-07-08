@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class RegionsSequence {
+public class RegionSequence {
   private static ListOfIntervals listOfIntervals;
   private static Map<Interval, String> nucleotidesIntervals;
 
@@ -15,9 +15,9 @@ public class RegionsSequence {
    * @param listOfIntervals      ListOfIntervals that contains intervals for which the string was cut
    * @param nucleotidesIntervals map with intervals and nucleotide substrings in each interval
    */
-  private RegionsSequence(ListOfIntervals listOfIntervals, Map<Interval, String> nucleotidesIntervals) {
-    RegionsSequence.listOfIntervals = listOfIntervals;
-    RegionsSequence.nucleotidesIntervals = nucleotidesIntervals;
+  private RegionSequence(ListOfIntervals listOfIntervals, Map<Interval, String> nucleotidesIntervals) {
+    RegionSequence.listOfIntervals = listOfIntervals;
+    RegionSequence.nucleotidesIntervals = nucleotidesIntervals;
   }
 
   /**
@@ -30,11 +30,11 @@ public class RegionsSequence {
    * @param intervals   ListOfIntervals that contains intervals
    *                    for which the string will be cut
    * @param nucleotides string with nucleotides
-   * @return instance of RegionsSequence
+   * @return instance of RegionSequence
    * @throws RuntimeException if nucleotides string is bigger
    *                          than intervals it should be covered with
    */
-  public static RegionsSequence createInstance(ListOfIntervals intervals, String nucleotides) {
+  public static RegionSequence createInstance(ListOfIntervals intervals, String nucleotides) {
     if (intervals.getLength() > nucleotides.length()) {
       throw new RuntimeException("Nucleotides do not fit intervals");
     }
@@ -43,7 +43,7 @@ public class RegionsSequence {
         Collectors.toMap(interval -> interval,
             interval -> nucleotides.substring(interval.getBegin(), interval.getEnd() + 1)));
 
-    return new RegionsSequence(intervals, nucleotidesIntervals);
+    return new RegionSequence(intervals, nucleotidesIntervals);
   }
 
   /**
