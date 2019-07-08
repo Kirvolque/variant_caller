@@ -12,7 +12,7 @@ public enum Nucleotide {
 
   public static Nucleotide fromCharacter(Character character) {
     try {
-      return Nucleotide.valueOf(String.valueOf(character));
+      return Nucleotide.valueOf(String.valueOf(character).toUpperCase());
     } catch (IllegalArgumentException | NullPointerException ex) {
     }
     return Nucleotide.UNDEFINED;
