@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
 }
 
 group 'com.variantcaller.politech'
@@ -12,9 +13,20 @@ repositories {
 }
 
 dependencies {
+    implementation 'commons-cli:commons-cli:1.4'
     testCompile("org.junit.jupiter:junit-jupiter-api:5.4.1")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.1")
+    implementation 'org.apache.commons:commons-lang3:3.9'
 }
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
+check.dependsOn jacocoTestReport
 
 test {
     useJUnitPlatform()
