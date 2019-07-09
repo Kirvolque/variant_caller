@@ -10,25 +10,25 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class FastaSequence {
-  private final Map<String, RegionsSequence> fastaData;
+  private final Map<String, RegionSequence> fastaData;
 
   /**
    * Class constructor.
    *
    * @param fastaData map that contains name of the chromosome as a key
-   *                  and RegionsSequence of nucleotides as a value
+   *                  and RegionSequence of nucleotides as a value
    */
-  private FastaSequence(Map<String, RegionsSequence> fastaData) {
+  private FastaSequence(Map<String, RegionSequence> fastaData) {
     this.fastaData = fastaData;
   }
 
   public static FastaSequence init(Map<String, String> data, Path pathToBedFile) throws IOException {
     Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(pathToBedFile);
 
-    Map<String, RegionsSequence> result = new HashMap<>();
+    Map<String, RegionSequence> result = new HashMap<>();
 
     for (Map.Entry item : bedData.entrySet()) {
-      result.put((String) item.getKey(), RegionsSequence.createInstance((ListOfIntervals) item.getValue(), data.get(item.getKey())));
+      result.put((String) item.getKey(), RegionSequence.createInstance((ListOfIntervals) item.getValue(), data.get(item.getKey())));
     }
 
     return new FastaSequence(result);
@@ -46,10 +46,10 @@ public class FastaSequence {
    * Gets sting of nucleotides contained in the fastaData.
    *
    * @param chromosome name of the chromosome
-   * @return RegionsSequence of nucleotides with this chromosome name
+   * @return RegionSequence of nucleotides with this chromosome name
    * @throws NoSuchElementException if there is no chromosome with such name
    */
-  private RegionsSequence getSequence(String chromosome) {
+  private RegionSequence getSequence(String chromosome) {
     if (fastaData.get(chromosome) == null) {
       throw new NoSuchElementException("No such chromosome");
     }
