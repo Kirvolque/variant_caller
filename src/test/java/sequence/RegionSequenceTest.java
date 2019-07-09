@@ -28,12 +28,12 @@ class RegionSequenceTest {
     intervals.add(INTERVAL_2);
     intervals.add(INTERVAL_3);
     listOfIntervals = new ListOfIntervals(intervals);
+    regionSequence = RegionSequence.createInstance(listOfIntervals, CHROMOSOME_SEQUENCE);
   }
 
   @Test
   @DisplayName("Test for listOfIntervals in createInstance() method")
   void testForIntervalList() {
-    regionSequence = RegionSequence.createInstance(listOfIntervals, CHROMOSOME_SEQUENCE);
     Assertions.assertEquals(listOfIntervals, regionSequence.getIntervalList());
   }
 
@@ -57,7 +57,8 @@ class RegionSequenceTest {
   }
 
   @Test
-  void getNucleotideAt() {
+  @DisplayName("Test for getNucleotideAt() method for position")
+  void getNucleotideAtPosition() {
     Assertions.assertEquals(Nucleotide.A, regionSequence.getNucleotideAt(0));
     Assertions.assertEquals(Nucleotide.C, regionSequence.getNucleotideAt(32));
     Assertions.assertEquals(Nucleotide.G, regionSequence.getNucleotideAt(14));
@@ -66,8 +67,29 @@ class RegionSequenceTest {
   }
 
   @Test
+  @DisplayName("Test for getNucleotideAt() method for interval")
+  void getNucleotideAtInterval() {
+    final List<Nucleotide> NUCLEOTIDES_INTERVAL_1 = new ArrayList<>();
+    final List<Nucleotide> NUCLEOTIDES_INTERVAL_2 = new ArrayList<>();
+    final List<Nucleotide> NUCLEOTIDES_INTERVAL_3 = new ArrayList<>();
+    for (Character c : CHROMOSOME_SEQUENCE_SUBSTRING_1.toCharArray()) {
+      NUCLEOTIDES_INTERVAL_1.add(Nucleotide.fromCharacter(c));
+    }
+    for (Character c : CHROMOSOME_SEQUENCE_SUBSTRING_2.toCharArray()) {
+      NUCLEOTIDES_INTERVAL_2.add(Nucleotide.fromCharacter(c));
+    }
+    for (Character c : CHROMOSOME_SEQUENCE_SUBSTRING_3.toCharArray()) {
+      NUCLEOTIDES_INTERVAL_3.add(Nucleotide.fromCharacter(c));
+    }
+    Assertions.assertEquals(NUCLEOTIDES_INTERVAL_1, regionSequence.getNucleotideAt(INTERVAL_1));
+    Assertions.assertEquals(NUCLEOTIDES_INTERVAL_2, regionSequence.getNucleotideAt(INTERVAL_2));
+    Assertions.assertEquals(NUCLEOTIDES_INTERVAL_3, regionSequence.getNucleotideAt(INTERVAL_3));
+  }
+
+  @Test
   void getNonexistentNucleotideAt() {
     Assertions.assertThrows(Exception.class, () -> regionSequence.getNucleotideAt(-1));
     Assertions.assertThrows(Exception.class, () -> regionSequence.getNucleotideAt(100));
+    Assertions.assertThrows(Exception.class, () -> regionSequence.getNucleotideAt(new Interval(-1, 0)));
   }
 }
