@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class RegionSequence {
-  private ListOfIntervals listOfIntervals;
-  private Map<Interval, String> nucleotidesIntervals;
+  private final ListOfIntervals listOfIntervals;
+  private final Map<Interval, String> nucleotidesIntervals;
 
   /**
    * Private constructor.
