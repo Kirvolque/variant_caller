@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class RegionSequenceTest {
   private static final Interval INTERVAL_1 = new Interval(0, 13);
   private static final Interval INTERVAL_2 = new Interval(14, 30);
   private static final Interval INTERVAL_3 = new Interval(31, 45);
-  private static final String CHROMOSOME_SEQUENCE = "AGCATGTTAGATAAGATAGCTGTGCTAGTAGGCAGTCAGCGCCATE";
+  private static final String CHROMOSOME_SEQUENCE =
+      "AGCATGTTAGATAAGATAGCTGTGCTAGTAGGCAGTCAGCGCCATE";
   private static final String CHROMOSOME_SEQUENCE_SUBSTRING_1 = "AGCATGTTAGATAA";
   private static final String CHROMOSOME_SEQUENCE_SUBSTRING_2 = "GATAGCTGTGCTAGTAG";
   private static final String CHROMOSOME_SEQUENCE_SUBSTRING_3 = "GCAGTCAGCGCCATE";
@@ -46,14 +48,19 @@ class RegionSequenceTest {
     Assertions.assertTrue(regionSequence.getNucleotidesIntervals().containsKey(INTERVAL_2));
     Assertions.assertTrue(regionSequence.getNucleotidesIntervals().containsKey(INTERVAL_3));
 
-    Assertions.assertEquals(CHROMOSOME_SEQUENCE_SUBSTRING_1, regionSequence.getNucleotidesIntervals().get(INTERVAL_1));
-    Assertions.assertEquals(CHROMOSOME_SEQUENCE_SUBSTRING_2, regionSequence.getNucleotidesIntervals().get(INTERVAL_2));
-    Assertions.assertEquals(CHROMOSOME_SEQUENCE_SUBSTRING_3, regionSequence.getNucleotidesIntervals().get(INTERVAL_3));
+    Assertions.assertEquals(
+        CHROMOSOME_SEQUENCE_SUBSTRING_1, regionSequence.getNucleotidesIntervals().get(INTERVAL_1));
+    Assertions.assertEquals(
+        CHROMOSOME_SEQUENCE_SUBSTRING_2, regionSequence.getNucleotidesIntervals().get(INTERVAL_2));
+    Assertions.assertEquals(
+        CHROMOSOME_SEQUENCE_SUBSTRING_3, regionSequence.getNucleotidesIntervals().get(INTERVAL_3));
   }
 
   @Test
   void createInstanceWithInvalidParams() {
-    Assertions.assertThrows(Exception.class, () -> RegionSequence.createInstance(listOfIntervals, TOO_SHORT_CHROMOSOME_SEQUENCE));
+    Assertions.assertThrows(
+        Exception.class,
+        () -> RegionSequence.createInstance(listOfIntervals, TOO_SHORT_CHROMOSOME_SEQUENCE));
   }
 
   @Test
@@ -69,18 +76,22 @@ class RegionSequenceTest {
   @Test
   @DisplayName("Test for getNucleotideAt() method for interval")
   void getNucleotideAtInterval() {
-    final List<Nucleotide> NUCLEOTIDES_INTERVAL_1 = new ArrayList<>();
-    final List<Nucleotide> NUCLEOTIDES_INTERVAL_2 = new ArrayList<>();
-    final List<Nucleotide> NUCLEOTIDES_INTERVAL_3 = new ArrayList<>();
-    for (Character c : CHROMOSOME_SEQUENCE_SUBSTRING_1.toCharArray()) {
-      NUCLEOTIDES_INTERVAL_1.add(Nucleotide.fromCharacter(c));
-    }
-    for (Character c : CHROMOSOME_SEQUENCE_SUBSTRING_2.toCharArray()) {
-      NUCLEOTIDES_INTERVAL_2.add(Nucleotide.fromCharacter(c));
-    }
-    for (Character c : CHROMOSOME_SEQUENCE_SUBSTRING_3.toCharArray()) {
-      NUCLEOTIDES_INTERVAL_3.add(Nucleotide.fromCharacter(c));
-    }
+    final List<Nucleotide> NUCLEOTIDES_INTERVAL_1 =
+        CHROMOSOME_SEQUENCE_SUBSTRING_1
+            .codePoints()
+            .mapToObj(c -> Nucleotide.fromCharacter((char) c))
+            .collect(Collectors.toList());
+    final List<Nucleotide> NUCLEOTIDES_INTERVAL_2 =
+        CHROMOSOME_SEQUENCE_SUBSTRING_2
+            .codePoints()
+            .mapToObj(c -> Nucleotide.fromCharacter((char) c))
+            .collect(Collectors.toList());
+    final List<Nucleotide> NUCLEOTIDES_INTERVAL_3 =
+        CHROMOSOME_SEQUENCE_SUBSTRING_3
+            .codePoints()
+            .mapToObj(c -> Nucleotide.fromCharacter((char) c))
+            .collect(Collectors.toList());
+
     Assertions.assertEquals(NUCLEOTIDES_INTERVAL_1, regionSequence.getNucleotideAt(INTERVAL_1));
     Assertions.assertEquals(NUCLEOTIDES_INTERVAL_2, regionSequence.getNucleotideAt(INTERVAL_2));
     Assertions.assertEquals(NUCLEOTIDES_INTERVAL_3, regionSequence.getNucleotideAt(INTERVAL_3));

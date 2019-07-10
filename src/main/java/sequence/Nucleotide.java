@@ -1,7 +1,7 @@
 package sequence;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public enum Nucleotide {
   A,
@@ -19,10 +19,11 @@ public enum Nucleotide {
   }
 
   public static List<Nucleotide> fromString(String string) {
-    List<Nucleotide> result = new ArrayList<>();
-    for (Character c : string.trim().toUpperCase().toCharArray()) {
-      result.add(Nucleotide.fromCharacter(c));
-    }
-    return result;
+    return string
+        .trim()
+        .toUpperCase()
+        .codePoints()
+        .mapToObj(c -> fromCharacter((char) c))
+        .collect(Collectors.toList());
   }
 }
