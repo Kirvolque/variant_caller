@@ -76,6 +76,14 @@ class RegionSequenceTest {
   @Test
   @DisplayName("Test for getNucleotideAt() method for interval")
   void getNucleotideAtInterval() {
+    Assertions.assertEquals(Nucleotide.A, regionSequence.getNucleotideAt(INTERVAL_1, 0));
+    Assertions.assertEquals(Nucleotide.G, regionSequence.getNucleotideAt(INTERVAL_2, 0));
+    Assertions.assertEquals(Nucleotide.C, regionSequence.getNucleotideAt(INTERVAL_3, 1));
+  }
+
+  @Test
+  @DisplayName("Test for getRegion() method for interval")
+  void getRegion() {
     final List<Nucleotide> NUCLEOTIDES_INTERVAL_1 =
         CHROMOSOME_SEQUENCE_SUBSTRING_1
             .codePoints()
@@ -92,15 +100,19 @@ class RegionSequenceTest {
             .mapToObj(c -> Nucleotide.fromCharacter((char) c))
             .collect(Collectors.toList());
 
-    Assertions.assertEquals(NUCLEOTIDES_INTERVAL_1, regionSequence.getNucleotideAt(INTERVAL_1));
-    Assertions.assertEquals(NUCLEOTIDES_INTERVAL_2, regionSequence.getNucleotideAt(INTERVAL_2));
-    Assertions.assertEquals(NUCLEOTIDES_INTERVAL_3, regionSequence.getNucleotideAt(INTERVAL_3));
+    final Region REGION_1 = new Region(NUCLEOTIDES_INTERVAL_1, 0);
+    final Region REGION_2 = new Region(NUCLEOTIDES_INTERVAL_2, REGION_1.getStartingPosition() + REGION_1.getRegion().size());
+    final Region REGION_3 = new Region(NUCLEOTIDES_INTERVAL_3, REGION_2.getStartingPosition() + REGION_2.getRegion().size());
+
+    Assertions.assertEquals(REGION_1, regionSequence.getRegion(INTERVAL_1));
+    Assertions.assertEquals(REGION_2, regionSequence.getRegion(INTERVAL_2));
+    Assertions.assertEquals(REGION_3, regionSequence.getRegion(INTERVAL_3));
   }
 
   @Test
   void getNonexistentNucleotideAt() {
     Assertions.assertThrows(Exception.class, () -> regionSequence.getNucleotideAt(-1));
     Assertions.assertThrows(Exception.class, () -> regionSequence.getNucleotideAt(100));
-    Assertions.assertThrows(Exception.class, () -> regionSequence.getNucleotideAt(new Interval(-1, 0)));
+    Assertions.assertThrows(Exception.class, () -> regionSequence.getRegion(new Interval(-1, 0)));
   }
 }
