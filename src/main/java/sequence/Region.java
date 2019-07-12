@@ -1,44 +1,45 @@
 package sequence;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class Region {
-  private final List<Nucleotide> region;
-  private final int startingPosition;
+  private final List<Nucleotide> nucleotideList;
+  private final Interval interval;
+
+  public Region(List<Nucleotide> nucleotideList, Interval interval) {
+    this.nucleotideList = nucleotideList;
+    this.interval = interval;
+  }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Region region1 = (Region) o;
-    return startingPosition == region1.startingPosition &&
-        Objects.equals(region, region1.region);
+    return Objects.equals(nucleotideList, region1.nucleotideList)
+        && Objects.equals(interval, region1.interval);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(region, startingPosition);
+    return Objects.hash(nucleotideList, interval);
   }
 
-  public Region(List<Nucleotide> region, int startingPosition) {
-    this.region = region;
-    this.startingPosition = startingPosition;
+  public List<Nucleotide> getNucleotideList() {
+    return nucleotideList;
   }
 
-  public List<Nucleotide> getRegion() {
-    return region;
-  }
-
-  public int getStartingPosition() {
-    return startingPosition;
+  public Interval getInterval() {
+    return interval;
   }
 
   public Nucleotide getNucleotideAt(int position) {
     try {
-      return region.get(position);
+      return nucleotideList.get(position);
     } catch (IndexOutOfBoundsException ex) {
-      throw new RuntimeException("Current position is not covered by this region");
+      throw new NoSuchElementException("Current position is not covered by this nucleotideList");
     }
   }
 }
