@@ -86,8 +86,8 @@ public class RegionSequence {
    * @throws RuntimeException if position is not covered by any region
    */
   public Nucleotide getNucleotideAt(Interval interval, int position) {
-    if (!listOfIntervals.checkIntervalsPresence(interval)) {
-      throw new RuntimeException("Current interval is not covered by any region");
+    if (!listOfIntervals.intervalIsPresent(interval)) {
+      throw new RuntimeException("Interval is not present");
     }
     return Nucleotide.fromCharacter(nucleotidesIntervals.get(interval).charAt(position));
   }
@@ -100,7 +100,7 @@ public class RegionSequence {
    * @throws RuntimeException if position is not covered by any region
    */
   public Region getRegion(Interval interval) {
-    if (!listOfIntervals.checkIntervalsPresence(interval)) {
+    if (!listOfIntervals.intervalIsPresent(interval)) {
       throw new RuntimeException("Current interval is not covered by any region");
     }
     return new Region(Nucleotide.fromString(nucleotidesIntervals.get(interval)), interval.getBegin());

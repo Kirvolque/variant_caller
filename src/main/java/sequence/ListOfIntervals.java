@@ -71,7 +71,7 @@ public class ListOfIntervals {
    * @param interval interval to be checked
    * @return true if it is present or false if not
    */
-  public Boolean checkIntervalsPresence(Interval interval) {
+  public Boolean intervalIsPresent(Interval interval) {
     return listOfIntervals.contains(interval);
   }
 }
