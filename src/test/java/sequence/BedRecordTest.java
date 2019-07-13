@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 class BedRecordTest {
   private static final String CHROMOSOME_NAME_1 = "chr1";
   private static final String CHROMOSOME_NAME_2 = "chr2";
+  private static final String INVALID_BEDRECORD_STRING_1 = "not_a_bed_format_string";
+  private static final String INVALID_BEDRECORD_STRING_2 = "track 0 1";
   private static BedRecord bedRecord1;
   private static BedRecord bedRecord2;
   private static BedRecord bedRecord3;
@@ -37,5 +39,14 @@ class BedRecordTest {
     Assertions.assertEquals(new Interval(26, 45), bedRecord2.getInterval());
     Assertions.assertEquals(new Interval(0, 3), bedRecord3.getInterval());
     Assertions.assertEquals(new Interval(4, 40), bedRecord4.getInterval());
+  }
+
+  @Test
+  @DisplayName("Check exception with invalid input")
+  void checkInvalidInput() {
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> BedRecord.init(INVALID_BEDRECORD_STRING_1));
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> BedRecord.init(INVALID_BEDRECORD_STRING_2));
   }
 }

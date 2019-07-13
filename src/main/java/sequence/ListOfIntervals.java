@@ -5,33 +5,33 @@ import java.util.List;
 import java.util.Optional;
 
 public class ListOfIntervals {
-  private List<Interval> listWithIntervals;
+  private List<Interval> listOfIntervals;
 
   /**
    * Class constructor.
    *
-   * @param listWithIntervals list with intervals
+   * @param listOfIntervals list with intervals
    */
-  public ListOfIntervals(List<Interval> listWithIntervals) {
-    this.listWithIntervals = listWithIntervals;
+  public ListOfIntervals(List<Interval> listOfIntervals) {
+    this.listOfIntervals = listOfIntervals;
   }
 
   /**
    * Gets the list of intervals.
    *
-   * @return a listWithIntervals as a list
+   * @return a listOfIntervals as a list
    */
   public List<Interval> asList() {
-    return new ArrayList<>(this.listWithIntervals);
+    return new ArrayList<>(this.listOfIntervals);
   }
 
   /**
-   * Gets the number of intervals contained in listWithIntervals.
+   * Gets the number of intervals contained in listOfIntervals.
    *
    * @return a number of intervals
    */
   public int getNumberOfIntervals() {
-    return listWithIntervals.size();
+    return listOfIntervals.size();
   }
 
   /**
@@ -40,28 +40,38 @@ public class ListOfIntervals {
    * @return a length of intervals
    */
   public int getLength() {
-    return listWithIntervals.stream().mapToInt(Interval::length).sum();
+    return listOfIntervals.stream().mapToInt(Interval::length).sum();
   }
 
   /**
-   * Gets interval from the listWithIntervals by it`s index in the list.
+   * Gets interval from the listOfIntervals by it`s index in the list.
    *
-   * @param index index to be found in the listWithIntervals
-   * @return interval from the listWithIntervals
+   * @param index index to be found in the listOfIntervals
+   * @return interval from the listOfIntervals
    * @throws IndexOutOfBoundsException if there is no interval under such index
    */
   public Interval getIntervalByIndex(int index) {
-    return listWithIntervals.get(index);
+    return listOfIntervals.get(index);
   }
 
   /**
-   * Gets interval from the listWithIntervals by the position it covers.
+   * Gets interval from the listOfIntervals by the position it covers.
    *
    * @param position position to be found in each of the intervals
-   * @return interval from the listWithIntervals if this position contains
+   * @return interval from the listOfIntervals if this position contains
    * in any of the intervals
    */
   public Optional<Interval> getIntervalByPosition(int position) {
-    return listWithIntervals.stream().filter(i -> i.contains(position)).findFirst();
+    return listOfIntervals.stream().filter(i -> i.contains(position)).findFirst();
+  }
+
+  /**
+   * Check presence of the interval in the list.
+   *
+   * @param interval interval to be checked
+   * @return true if it is present or false if not
+   */
+  public Boolean intervalIsPresent(Interval interval) {
+    return listOfIntervals.contains(interval);
   }
 }
