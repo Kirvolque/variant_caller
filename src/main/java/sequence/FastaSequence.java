@@ -28,7 +28,7 @@ public class FastaSequence {
     Map<String, RegionSequence> result = new HashMap<>();
 
     for (Map.Entry item : bedData.entrySet()) {
-      result.put((String) item.getKey(), RegionSequence.createInstance((ListOfIntervals) item.getValue(), data.get(item.getKey())));
+      result.put((String) item.getKey(), RegionSequence.createInstance(((ListOfIntervals) item.getValue()).asList(), data.get(item.getKey())));
     }
 
     return new FastaSequence(result);

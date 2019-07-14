@@ -5,21 +5,25 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 public class RegionSequence {
-  private static final String INTERVAL_MISS_EXCEPTION_MESSAGE = "Current position is not covered by any region";
-  private static final String REGION_MISS_EXCEPTION_MESSAGE = "No region fit interval with this position";
-  private static final String INCORRECT_INPUT_EXCEPTION_MESSAGE = "Nucleotides do not fit intervals";
-  private static final String INTERVAL_IS_NOT_PRESENT_EXCEPTION_MESSAGE = "No region fit interval with this position";
-  private final ListOfIntervals listOfIntervals;
+  private static final String INTERVAL_MISS_EXCEPTION_MESSAGE =
+      "Current position is not covered by any region";
+  private static final String REGION_MISS_EXCEPTION_MESSAGE =
+      "No region fit interval with this position";
+  private static final String INCORRECT_INPUT_EXCEPTION_MESSAGE =
+      "Nucleotides do not fit intervals";
+  private static final String INTERVAL_IS_NOT_PRESENT_EXCEPTION_MESSAGE =
+      "No region fit interval with this position";
+  private final List<Interval> intervalList;
   private final List<Region> regionList;
 
   /**
    * Private constructor. Use createInstance() method to get instance of the class.
    *
-   * @param listOfIntervals ListOfIntervals class
+   * @param intervalList ListOfIntervals class
    * @param regionList list with intervals and nucleotide lists in each interval
    */
-  private RegionSequence(ListOfIntervals listOfIntervals, List<Region> regionList) {
-    this.listOfIntervals = listOfIntervals;
+  private RegionSequence(List<Interval> intervalList, List<Region> regionList) {
+    this.intervalList = intervalList;
     this.regionList = regionList;
   }
 
@@ -29,28 +33,28 @@ public class RegionSequence {
    *
    * <p>String with nucleotides must fit passed interval list.
    *
-   * @param intervals ListOfIntervals that contains intervals for which the string will be cut
+   * @param intervalList ListOfIntervals that contains intervals for which the string will be cut
    * @param nucleotides string with nucleotides
    * @return instance of RegionSequence
    * @throws NoSuchElementException if nucleotides string is bigger than intervals it should be
    *     covered with
    */
-  public static RegionSequence createInstance(ListOfIntervals intervals, String nucleotides) {
-    if (intervals.getLength() > nucleotides.length()) {
+  public static RegionSequence createInstance(List<Interval> intervalList, String nucleotides) {
+    if (intervalList.size() > nucleotides.length()) {
       throw new NoSuchElementException(INCORRECT_INPUT_EXCEPTION_MESSAGE);
     }
 
     List<Region> regionList =
-        intervals.asList().stream()
+        intervalList.stream()
             .map(
                 interval ->
                     new Region(
                         Nucleotide.fromString(
                             nucleotides.substring(interval.getBegin(), interval.getEnd() + 1)),
-                        interval))
+                        interval.getBegin()))
             .collect(Collectors.toList());
 
-    return new RegionSequence(intervals, regionList);
+    return new RegionSequence(intervalList, regionList);
   }
 
   /**
@@ -59,8 +63,8 @@ public class RegionSequence {
    *
    * @return a list of intervals
    */
-  public ListOfIntervals getIntervalList() {
-    return listOfIntervals;
+  public List<Interval> getIntervalList() {
+    return intervalList;
   }
 
   /**
@@ -73,25 +77,26 @@ public class RegionSequence {
   }
 
   /**
+   * @deprecated
    * Returns nucleotide in the given position.
    *
    * @param position position to be found in the nucleotidesIntervals
    * @return nucleotide in this position if it exists
    * @throws NoSuchElementException if position is not covered by any region
    */
+  @Deprecated
   public Nucleotide getNucleotideAt(int position) {
     Interval interval =
-        listOfIntervals
-            .getIntervalByPosition(position)
-            .orElseThrow(
-                () -> new NoSuchElementException(INTERVAL_MISS_EXCEPTION_MESSAGE));
+        intervalList.stream()
+            .filter(i -> i.contains(position))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException(INTERVAL_MISS_EXCEPTION_MESSAGE));
 
     Region regionInInterval =
         regionList.stream()
-            .filter(region -> region.getInterval().equals(interval))
+            .filter(region -> region.getStartPosition() == interval.getBegin())
             .findFirst()
-            .orElseThrow(
-                () -> new NoSuchElementException(REGION_MISS_EXCEPTION_MESSAGE));
+            .orElseThrow(() -> new NoSuchElementException(REGION_MISS_EXCEPTION_MESSAGE));
 
     final int positionInSubstring = position - interval.getBegin();
     return regionInInterval.getNucleotideAt(positionInSubstring);
@@ -106,15 +111,14 @@ public class RegionSequence {
    * @throws NoSuchElementException if position is not covered by any region
    */
   public Nucleotide getNucleotideAt(Interval interval, int position) {
-    if (!listOfIntervals.intervalIsPresent(interval)) {
+    if (!intervalList.contains(interval)) {
       throw new NoSuchElementException(INTERVAL_IS_NOT_PRESENT_EXCEPTION_MESSAGE);
     }
     Region regionInInterval =
         regionList.stream()
-            .filter(region -> region.getInterval().equals(interval))
+            .filter(region -> region.getStartPosition() == interval.getBegin())
             .findFirst()
-            .orElseThrow(
-                () -> new NoSuchElementException(REGION_MISS_EXCEPTION_MESSAGE));
+            .orElseThrow(() -> new NoSuchElementException(REGION_MISS_EXCEPTION_MESSAGE));
 
     return regionInInterval.getNucleotideAt(position);
   }
@@ -127,12 +131,12 @@ public class RegionSequence {
    * @throws NoSuchElementException if position is not covered by any region
    */
   public Region getRegion(Interval interval) {
-    if (!listOfIntervals.intervalIsPresent(interval)) {
+    if (!intervalList.contains(interval)) {
       throw new NoSuchElementException(INTERVAL_IS_NOT_PRESENT_EXCEPTION_MESSAGE);
     }
 
     return regionList.stream()
-        .filter(region -> region.getInterval().equals(interval))
+        .filter(region -> region.getStartPosition() == interval.getBegin())
         .findFirst()
         .orElseThrow(() -> new NoSuchElementException(REGION_MISS_EXCEPTION_MESSAGE));
   }

@@ -6,11 +6,11 @@ import java.util.Objects;
 
 public class Region {
   private final List<Nucleotide> nucleotideList;
-  private final Interval interval;
+  private final int startPosition;
 
-  public Region(List<Nucleotide> nucleotideList, Interval interval) {
+  public Region(List<Nucleotide> nucleotideList, int startPosition) {
     this.nucleotideList = nucleotideList;
-    this.interval = interval;
+    this.startPosition = startPosition;
   }
 
   @Override
@@ -19,20 +19,20 @@ public class Region {
     if (o == null || getClass() != o.getClass()) return false;
     Region region1 = (Region) o;
     return Objects.equals(nucleotideList, region1.nucleotideList)
-        && Objects.equals(interval, region1.interval);
+        && Objects.equals(startPosition, region1.startPosition);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(nucleotideList, interval);
+    return Objects.hash(nucleotideList, startPosition);
   }
 
   public List<Nucleotide> getNucleotideList() {
     return nucleotideList;
   }
 
-  public Interval getInterval() {
-    return interval;
+  public int getStartPosition() {
+    return startPosition;
   }
 
   public Nucleotide getNucleotideAt(int position) {
