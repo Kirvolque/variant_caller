@@ -30,7 +30,7 @@ public class FastaParser {
     return new FastaParser(new FastaSequenceIterable(reader).iterator());
   }
 
-  public FastaSequence getNext(ListOfIntervals intervals) throws IOException {
+  public FastaSequence getNext(ListOfIntervals intervals) {
     if (sequenceIterator.hasNext() && sequenceIterator.hasNext(intervals)) {
       return sequenceIterator.next();
     }

@@ -33,28 +33,20 @@ class FastaParserTest {
                 Objects.requireNonNull(
                     FastaParserTest.class.getClassLoader().getResource(FASTA_FILE_NAME))
                     .toURI()));
-    Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(
-        Paths.get(
-            Objects.requireNonNull(
-                FastaParserTest.class.getClassLoader().getResource(BED_FILE_NAME))
-                .toURI()));
-    bedData.forEach((s, intervals) -> {
-      try {
-        fastaSequenceList.add(fastaParser.getNext(intervals));
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    });
+    Map<String, ListOfIntervals> bedData =
+        BedParser.collectIntervals(
+            Paths.get(
+                Objects.requireNonNull(
+                    FastaParserTest.class.getClassLoader().getResource(BED_FILE_NAME))
+                    .toURI()));
+    bedData.forEach((s, intervals) -> fastaSequenceList.add(fastaParser.getNext(intervals)));
   }
 
   @Test
   @DisplayName("Parse unexciting fasta file")
   void parseUnexcitingFastaFile() {
     Assertions.assertThrows(
-        IOException.class,
-        () ->
-            FastaParser.parseFasta(
-                Paths.get("i_dont_exist.fa")));
+        IOException.class, () -> FastaParser.parseFasta(Paths.get("i_dont_exist.fa")));
   }
 
   @Test

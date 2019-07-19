@@ -48,16 +48,11 @@ class VariantCallerTest {
                     .toURI()));
 
     bedData.forEach(
-        (chromosomeName, listOfIntervals) -> {
-          try {
+        (chromosomeName, listOfIntervals) ->
             variantCaller.processIntervals(
                 fastaParser.getNext(listOfIntervals),
                 samParser.getReadsForRegion(chromosomeName, listOfIntervals),
-                listOfIntervals);
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        });
+                listOfIntervals));
     variationList = variantCaller.filterVariations(minAlleleFrequency);
   }
 

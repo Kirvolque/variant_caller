@@ -6,10 +6,9 @@ import lombok.Getter;
 
 @EqualsAndHashCode
 @AllArgsConstructor
+@Getter
 public class Interval {
-  @Getter
   private int begin;
-  @Getter
   private int end;
 
   /**

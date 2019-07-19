@@ -1,6 +1,7 @@
 package fastaparser.fastasequenceiterator;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import sequence.FastaSequence;
 import sequence.ListOfIntervals;
 
@@ -8,16 +9,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Iterator;
 
+@RequiredArgsConstructor
 public class FastaSequenceIterator implements Iterator<FastaSequence> {
   private static final String HEADER_START_REGEX = "[>;].*";
+  @NonNull
   private BufferedReader reader;
   private FastaSequence currentFastaSequence;
   private String currentChromosomeName = "";
   private boolean firstLine = true;
-
-  FastaSequenceIterator(@NonNull final BufferedReader reader) {
-    this.reader = reader;
-  }
 
   @Override
   public boolean hasNext() {
@@ -28,27 +27,31 @@ public class FastaSequenceIterator implements Iterator<FastaSequence> {
     }
   }
 
-  public boolean hasNext(ListOfIntervals intervals) throws IOException {
+  public boolean hasNext(ListOfIntervals intervals) {
     String line;
     StringBuilder currentSequence = new StringBuilder();
     String chromosomeName = "";
 
-    if (firstLine) {
-      if ((line = reader.readLine()) != null) {
-        chromosomeName = line.trim().substring(1);
-        firstLine = false;
-      }
-    } else {
-      chromosomeName = currentChromosomeName;
-    }
-
-    while ((line = reader.readLine()) != null) {
-      if (!line.matches(HEADER_START_REGEX)) {
-        currentSequence.append(line);
+    try {
+      if (firstLine) {
+        if ((line = reader.readLine()) != null) {
+          chromosomeName = line.trim().substring(1);
+          firstLine = false;
+        }
       } else {
-        currentChromosomeName = line.trim().substring(1);
-        break;
+        chromosomeName = currentChromosomeName;
       }
+
+      while ((line = reader.readLine()) != null) {
+        if (!line.matches(HEADER_START_REGEX)) {
+          currentSequence.append(line);
+        } else {
+          currentChromosomeName = line.trim().substring(1);
+          break;
+        }
+      }
+    } catch (IOException ex) {
+      return false;
     }
 
     currentFastaSequence =

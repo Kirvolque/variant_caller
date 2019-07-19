@@ -1,6 +1,7 @@
 package samparser.samrecorditerator;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import sequence.ListOfIntervals;
 import sequence.SamRecord;
 
@@ -8,18 +9,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Iterator;
 
+@RequiredArgsConstructor
 public class SamRecordIterator implements Iterator<SamRecord> {
+  @NonNull
   private BufferedReader reader;
   private SamRecord currentSamRecord;
   private SamRecord previousSamRecord = null;
   private boolean previousUsed = false;
 
-  SamRecordIterator(@NonNull final BufferedReader reader) {
-    this.reader = reader;
-  }
-
-  public boolean hasNextForIntervals(String chromosomeName, ListOfIntervals intervals)
-      throws IOException {
+  public boolean hasNextForIntervals(String chromosomeName, ListOfIntervals intervals) {
 
     if (previousSamRecord != null) {
       currentSamRecord = previousSamRecord;
@@ -30,9 +28,13 @@ public class SamRecordIterator implements Iterator<SamRecord> {
       }
     } else {
       String line;
-      if ((line = reader.readLine()) != null) {
-        currentSamRecord = SamRecord.init(line);
-      } else {
+      try {
+        if ((line = reader.readLine()) != null) {
+          currentSamRecord = SamRecord.init(line);
+        } else {
+          return false;
+        }
+      } catch (IOException e) {
         return false;
       }
     }
