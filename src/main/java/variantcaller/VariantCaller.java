@@ -61,7 +61,9 @@ public class VariantCaller {
       SamRecord samRecord, FastaSequence fastaSequence, Interval interval) {
     StringBuilder refBuilder = new StringBuilder();
     try {
-      for (int i = prevFastaIndex; i < fastaIndex; i++) {
+      for (int i = prevFastaIndex - interval.getBegin();
+           i < fastaIndex - interval.getBegin();
+           i++) {
         refBuilder.append(fastaSequence.getNucleotide(interval, i));
       }
     } catch (NoSuchElementException ex) {
@@ -104,22 +106,22 @@ public class VariantCaller {
 
   private void processSamRecords(
       FastaSequence fastaSequence, List<SamRecord> samRecordList, Interval interval) {
-    samRecordList.forEach(
-        samRecord -> {
-          prevSamIndex = samRecord.getPos();
-          prevFastaIndex = samRecord.getPos() - 1;
-          samIndex = samRecord.getPos();
-          fastaIndex = samRecord.getPos() - 1;
-          processSamRecord(samRecord, fastaSequence, interval);
-        });
+    samRecordList.stream()
+        .filter(samRecord -> samRecord.fitInterval(interval))
+        .forEach(
+            samRecord -> {
+              prevSamIndex = samRecord.getPos();
+              prevFastaIndex = samRecord.getPos() - 1;
+              samIndex = samRecord.getPos();
+              fastaIndex = samRecord.getPos() - 1;
+              processSamRecord(samRecord, fastaSequence, interval);
+            });
   }
 
   public void processIntervals(
-      FastaSequence fastaSequence,
-      List<SamRecord> samRecordStream,
-      ListOfIntervals listOfIntervals) {
+      FastaSequence fastaSequence, List<SamRecord> samRecordList, ListOfIntervals listOfIntervals) {
     listOfIntervals
         .asList()
-        .forEach(interval -> processSamRecords(fastaSequence, samRecordStream, interval));
+        .forEach(interval -> processSamRecords(fastaSequence, samRecordList, interval));
   }
 }

@@ -25,9 +25,10 @@ public class SamParser {
     return new SamParser(new SamRecordIterable(reader).iterator());
   }
 
-  public List<SamRecord> getReadsForRegion(String chromosomeName, ListOfIntervals intervals) throws IOException {
+  public List<SamRecord> getReadsForRegion(String chromosomeName, ListOfIntervals intervals)
+      throws IOException {
     List<SamRecord> suitableSamRecords = new ArrayList<>();
-    while (recordIterator.hasNext() && recordIterator.hasNextForIntervals(chromosomeName, intervals)) {
+    while (recordIterator.hasNextForIntervals(chromosomeName, intervals)) {
       suitableSamRecords.add(recordIterator.nextForIntervals());
     }
     return suitableSamRecords;

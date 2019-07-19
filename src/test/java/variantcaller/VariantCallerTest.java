@@ -65,8 +65,8 @@ class VariantCallerTest {
   @DisplayName("Check variations with matches only")
   void checkVariationsWithOnlyMatches() {
     Assertions.assertEquals(
-        new Variation(CHROMOSOME_NAME_1, 9, "GATAAGATAG", "ATAAGATAGC"), variationList.get(1));
+        new Variation(CHROMOSOME_NAME_1, 9, "GATAAGATAG", "ATAAGATAGC"), variationList.get(0));
     Assertions.assertEquals(
-        new Variation(CHROMOSOME_NAME_1, 9, "TCAGCGCCAT", "ATAAGATAGC"), variationList.get(0));
+        new Variation(CHROMOSOME_NAME_2, 19, "AGTCTACAGA", "GTCTACAGAG"), variationList.get(1));
   }
 }

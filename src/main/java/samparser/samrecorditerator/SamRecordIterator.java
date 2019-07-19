@@ -11,21 +11,36 @@ import java.util.Iterator;
 public class SamRecordIterator implements Iterator<SamRecord> {
   private BufferedReader reader;
   private SamRecord currentSamRecord;
+  private SamRecord previousSamRecord = null;
+  private boolean previousUsed = false;
 
   SamRecordIterator(@NonNull final BufferedReader reader) {
     this.reader = reader;
   }
 
-  public boolean hasNextForIntervals(String chromosomeName, ListOfIntervals intervals) throws IOException {
-    currentSamRecord = SamRecord.init(reader.readLine());
+  public boolean hasNextForIntervals(String chromosomeName, ListOfIntervals intervals)
+      throws IOException {
+
+    if (previousSamRecord != null) {
+      currentSamRecord = previousSamRecord;
+      if (previousUsed) {
+        return false;
+      } else {
+        previousUsed = true;
+      }
+    } else {
+      String line;
+      if ((line = reader.readLine()) != null) {
+        currentSamRecord = SamRecord.init(line);
+      } else {
+        return false;
+      }
+    }
     if (!currentSamRecord.getRname().equals(chromosomeName)) {
+      previousSamRecord = currentSamRecord;
       return false;
     }
-    return intervals.asList().stream()
-        .anyMatch(
-            interval ->
-                ((interval.getBegin() <= currentSamRecord.getPos() - 1)
-                    && (interval.length() >= currentSamRecord.getCigarLength() - 1)));
+    return intervals.asList().stream().anyMatch(interval -> currentSamRecord.fitInterval(interval));
   }
 
   public SamRecord nextForIntervals() {

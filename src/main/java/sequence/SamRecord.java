@@ -103,4 +103,8 @@ public class SamRecord {
       return cigarLength;
     }
   }
+
+  public boolean fitInterval(Interval interval) {
+    return (interval.getBegin() <= getPos() - 1) && (interval.length() >= getCigarLength() - 1);
+  }
 }
