@@ -1,9 +1,7 @@
 package vcfwriter;
 
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import temporarytools.TemporaryTools;
 import vcfwriter.variation.Variation;
 
@@ -23,11 +21,9 @@ public class TestVcfWriter {
       VcfWriter vcfWriter = new VcfWriter(path.toString());
       Assertions.assertTrue(Files.exists(path));
       vcfWriter.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println(e.getMessage());
     }
-
   }
 
   @Test
@@ -36,7 +32,7 @@ public class TestVcfWriter {
       Path path = TemporaryTools.tempFile("result", ".vcf");
       VcfWriter vcfWriter = new VcfWriter(path.toString());
       Variation var1 = new Variation("20", 1444, "G", "A");
-      Variation var2 = new Variation("20", 1444, "microsati", "G", "A", "47", "PASS", "NS=3");
+      Variation var2 = new Variation("20", 1444, "microsati", "G", "A", "47", "PASS", "NS=3", 0);
       List<Variation> vars = new ArrayList<>();
       vars.add(var1);
       vars.add(var2);
@@ -56,11 +52,9 @@ public class TestVcfWriter {
       Assertions.assertTrue(scanner.nextInt() == 1444);
       Assertions.assertTrue(scanner.next().equals("microsati"));
       scanner.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println(e.getMessage());
     }
-
   }
 
   @Test
@@ -82,13 +76,8 @@ public class TestVcfWriter {
       Assertions.assertTrue(scanner.hasNextLine());
       Assertions.assertFalse(scanner.hasNext());
       scanner.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println(e.getMessage());
     }
-
   }
-
-
 }
-

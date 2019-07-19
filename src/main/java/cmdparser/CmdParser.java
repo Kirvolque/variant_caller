@@ -1,9 +1,12 @@
 package cmdparser;
 
+import bedparser.BedParser;
 import fastaparser.FastaParser;
+import lombok.AccessLevel;
+import lombok.Setter;
 import org.apache.commons.cli.*;
 import samparser.SamParser;
-import sequence.FastaSequence;
+import sequence.ListOfIntervals;
 import variantcaller.VariantCaller;
 import vcfwriter.VcfWriter;
 
@@ -12,34 +15,24 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class CmdParser {
 
-  private static String fastaFilePath;
+  @Setter(AccessLevel.PRIVATE)
+  private static Path fastaFilePath;
+
+  @Setter(AccessLevel.PRIVATE)
   private static Path samFilePath;
+
+  @Setter(AccessLevel.PRIVATE)
   private static Path bedFilePath;
+
+  @Setter(AccessLevel.PRIVATE)
   private static String vcfFilePath;
+
+  @Setter(AccessLevel.PRIVATE)
   private static Double minAlleleFrequency;
-
-  private static void setFastaFilePath(String fastaFilePath) {
-    CmdParser.fastaFilePath = fastaFilePath;
-  }
-
-  private static void setSamFilePath(Path samFilePath) {
-    CmdParser.samFilePath = samFilePath;
-  }
-
-  private static void setBedFilePath(Path bedFilePath) {
-    CmdParser.bedFilePath = bedFilePath;
-  }
-
-  private static void setVcfFilePath(String vcfFilePath) {
-    CmdParser.vcfFilePath = vcfFilePath;
-  }
-
-  private static void setMinAlleleFrequency(Double minAlleleFrequency) {
-    CmdParser.minAlleleFrequency = minAlleleFrequency;
-  }
 
   private static void printHelp(
       final Options options,
@@ -102,7 +95,7 @@ public class CmdParser {
           || minAlleleFrequency == null) {
         System.out.println("Wrong param for filepath option");
       } else {
-        setFastaFilePath(fastaFilePath);
+        setFastaFilePath(Paths.get(fastaFilePath));
         setSamFilePath(Paths.get(samFilePath));
         setBedFilePath(Paths.get(bedFilePath));
         setVcfFilePath(vcfFilePath);
@@ -113,9 +106,22 @@ public class CmdParser {
   }
 
   private static void work() throws IOException {
-    FastaSequence fastaSequence = FastaParser.parseFasta(fastaFilePath, bedFilePath);
+    Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(bedFilePath);
+    FastaParser fastaParser = FastaParser.parseFasta(fastaFilePath);
+    SamParser samParser = SamParser.parseSam(samFilePath);
     VariantCaller variantCaller = new VariantCaller();
-    variantCaller.processSamRecords(fastaSequence, SamParser.parseSam(samFilePath));
+    bedData.forEach(
+        (chromosomeName, listOfIntervals) -> {
+          try {
+            variantCaller.processIntervals(
+                fastaParser.getNext(listOfIntervals),
+                samParser.getReadsForRegion(chromosomeName, listOfIntervals),
+                listOfIntervals);
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        });
+
     VcfWriter vcfWriter = new VcfWriter(vcfFilePath);
     vcfWriter.writeHeadersOfData();
     vcfWriter.writeData(variantCaller.filterVariations(minAlleleFrequency));

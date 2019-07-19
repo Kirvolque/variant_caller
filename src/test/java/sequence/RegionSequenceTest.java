@@ -51,31 +51,32 @@ class RegionSequenceTest {
             .mapToObj(c -> Nucleotide.fromCharacter((char) c))
             .collect(Collectors.toList());
 
-    REGION_1 = new Region(NUCLEOTIDES_INTERVAL_1, INTERVAL_1);
-    REGION_2 = new Region(NUCLEOTIDES_INTERVAL_2, INTERVAL_2);
-    REGION_3 = new Region(NUCLEOTIDES_INTERVAL_3, INTERVAL_3);
+    REGION_1 = new Region(NUCLEOTIDES_INTERVAL_1, INTERVAL_1.getBegin());
+    REGION_2 = new Region(NUCLEOTIDES_INTERVAL_2, INTERVAL_2.getBegin());
+    REGION_3 = new Region(NUCLEOTIDES_INTERVAL_3, INTERVAL_3.getBegin());
   }
 
   @Test
   @DisplayName("Test for listOfIntervals in createInstance() method")
   void testForIntervalList() {
-    Assertions.assertEquals(listOfIntervals, regionSequence.getIntervalList());
+    Assertions.assertEquals(listOfIntervals, regionSequence.getListOfIntervals());
   }
 
   @Test
   @DisplayName("Test for nucleotidesIntervals in createInstance() method")
   void testForNucleotidesIntervals() {
     regionSequence = RegionSequence.createInstance(listOfIntervals, CHROMOSOME_SEQUENCE);
-    List<Region> regionListExpected = new ArrayList<>();
-    regionListExpected.add(REGION_1);
-    regionListExpected.add(REGION_2);
-    regionListExpected.add(REGION_3);
 
-    Assertions.assertTrue(regionSequence.getIntervalList().intervalIsPresent(INTERVAL_1));
-    Assertions.assertTrue(regionSequence.getIntervalList().intervalIsPresent(INTERVAL_2));
-    Assertions.assertTrue(regionSequence.getIntervalList().intervalIsPresent(INTERVAL_3));
+    Assertions.assertTrue(regionSequence.getListOfIntervals().intervalIsPresent(INTERVAL_1));
+    Assertions.assertTrue(regionSequence.getListOfIntervals().intervalIsPresent(INTERVAL_2));
+    Assertions.assertTrue(regionSequence.getListOfIntervals().intervalIsPresent(INTERVAL_3));
 
-    Assertions.assertEquals(regionListExpected, regionSequence.getRegionList());
+    Assertions.assertEquals(
+        CHROMOSOME_SEQUENCE_SUBSTRING_1, regionSequence.getNucleotidesIntervals().get(INTERVAL_1));
+    Assertions.assertEquals(
+        CHROMOSOME_SEQUENCE_SUBSTRING_2, regionSequence.getNucleotidesIntervals().get(INTERVAL_2));
+    Assertions.assertEquals(
+        CHROMOSOME_SEQUENCE_SUBSTRING_3, regionSequence.getNucleotidesIntervals().get(INTERVAL_3));
   }
 
   @Test
@@ -86,6 +87,7 @@ class RegionSequenceTest {
   }
 
   @Test
+  @Deprecated
   @DisplayName("Test for getNucleotideAt() method for position")
   void getNucleotideAtPosition() {
     Assertions.assertEquals(Nucleotide.A, regionSequence.getNucleotideAt(0));
@@ -112,9 +114,12 @@ class RegionSequenceTest {
   }
 
   @Test
+  @Deprecated
   void getNonexistentNucleotideAt() {
     Assertions.assertThrows(NoSuchElementException.class, () -> regionSequence.getNucleotideAt(-1));
-    Assertions.assertThrows(NoSuchElementException.class, () -> regionSequence.getNucleotideAt(100));
-    Assertions.assertThrows(NoSuchElementException.class, () -> regionSequence.getRegion(new Interval(-1, 0)));
+    Assertions.assertThrows(
+        NoSuchElementException.class, () -> regionSequence.getNucleotideAt(100));
+    Assertions.assertThrows(
+        NoSuchElementException.class, () -> regionSequence.getRegion(new Interval(-1, 0)));
   }
 }

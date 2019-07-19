@@ -1,14 +1,16 @@
 package variantcaller;
 
 import sequence.FastaSequence;
+import sequence.Interval;
+import sequence.ListOfIntervals;
 import sequence.SamRecord;
 import vcfwriter.variation.Variation;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class VariantCaller {
   private int prevSamIndex = 0;
@@ -55,10 +57,15 @@ public class VariantCaller {
         .collect(Collectors.toList());
   }
 
-  private void incrementAlleleDepth(SamRecord samRecord, FastaSequence fastaSequence) {
+  private void incrementAlleleDepth(
+      SamRecord samRecord, FastaSequence fastaSequence, Interval interval) {
     StringBuilder refBuilder = new StringBuilder();
-    for (int i = prevFastaIndex; i < fastaIndex; i++) {
-      refBuilder.append(fastaSequence.getNucleotide(samRecord.getRname(), i));
+    try {
+      for (int i = prevFastaIndex; i < fastaIndex; i++) {
+        refBuilder.append(fastaSequence.getNucleotide(interval, i));
+      }
+    } catch (NoSuchElementException ex) {
+
     }
 
     String ref = refBuilder.toString();
@@ -83,25 +90,36 @@ public class VariantCaller {
     }
   }
 
-  private void processSamRecord(SamRecord samRecord, FastaSequence fastaSequence) {
+  private void processSamRecord(
+      SamRecord samRecord, FastaSequence fastaSequence, Interval interval) {
     samRecord
         .getCigarStream()
         .peek(this::incrementPositions)
         .forEach(
             cigarPair -> {
-              incrementAlleleDepth(samRecord, fastaSequence);
+              incrementAlleleDepth(samRecord, fastaSequence, interval);
               incrementTotalDepth(samRecord, cigarPair.getValue());
             });
   }
 
-  public void processSamRecords(FastaSequence fastaSequence, Stream<SamRecord> samRecordStream) {
-    samRecordStream.forEach(
+  private void processSamRecords(
+      FastaSequence fastaSequence, List<SamRecord> samRecordList, Interval interval) {
+    samRecordList.forEach(
         samRecord -> {
           prevSamIndex = samRecord.getPos();
           prevFastaIndex = samRecord.getPos() - 1;
           samIndex = samRecord.getPos();
           fastaIndex = samRecord.getPos() - 1;
-          processSamRecord(samRecord, fastaSequence);
+          processSamRecord(samRecord, fastaSequence, interval);
         });
+  }
+
+  public void processIntervals(
+      FastaSequence fastaSequence,
+      List<SamRecord> samRecordStream,
+      ListOfIntervals listOfIntervals) {
+    listOfIntervals
+        .asList()
+        .forEach(interval -> processSamRecords(fastaSequence, samRecordStream, interval));
   }
 }

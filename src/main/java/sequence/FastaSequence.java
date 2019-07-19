@@ -1,70 +1,28 @@
 package sequence;
 
-import bedparser.BedParser;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class FastaSequence {
-  private final Map<String, RegionSequence> fastaData;
+  @Getter
+  private final String chromosomeName;
+  @Getter
+  private final RegionSequence regionSequence;
 
-  /**
-   * Class constructor.
-   *
-   * @param fastaData map that contains name of the chromosome as a key
-   *                  and RegionSequence of nucleotides as a value
-   */
-  private FastaSequence(Map<String, RegionSequence> fastaData) {
-    this.fastaData = fastaData;
-  }
-
-  public static FastaSequence init(Map<String, String> data, Path pathToBedFile) throws IOException {
-    Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(pathToBedFile);
-
-    Map<String, RegionSequence> result = new HashMap<>();
-
-    for (Map.Entry item : bedData.entrySet()) {
-      result.put((String) item.getKey(), RegionSequence.createInstance(((ListOfIntervals) item.getValue()).asList(), data.get(item.getKey())));
-    }
-
-    return new FastaSequence(result);
-  }
-  /**
-   * Gets set of chromosomes stored in the instance of the class.
-   *
-   * @return set of strings represents names of the chromosomes
-   */
-  public Set<String> getChromosomes() {
-    return fastaData.keySet();
-  }
-
-  /**
-   * Gets sting of nucleotides contained in the fastaData.
-   *
-   * @param chromosome name of the chromosome
-   * @return RegionSequence of nucleotides with this chromosome name
-   * @throws NoSuchElementException if there is no chromosome with such name
-   */
-  private RegionSequence getSequence(String chromosome) {
-    if (fastaData.get(chromosome) == null) {
-      throw new NoSuchElementException("No such chromosome");
-    }
-    return fastaData.get(chromosome);
+  public static FastaSequence init(String chromosomeName, String seq, ListOfIntervals intervals) {
+    return new FastaSequence(chromosomeName, RegionSequence.createInstance(intervals, seq));
   }
 
   /**
    * Gets nucleotide in the chromosome with such name by it`s position.
    *
-   * @param chromosome         name of the chromosome
-   * @param nucleotidePosition position of the nucleotide in this chromosome
+   * @param interval position of the nucleotide in this chromosome
    * @return nucleotide in this position
    * @throws RuntimeException if there is no such position in this chromosome
    */
-  public Nucleotide getNucleotide(String chromosome, int nucleotidePosition) {
-    return getSequence(chromosome).getNucleotideAt(nucleotidePosition);
+  public Nucleotide getNucleotide(Interval interval, int position) {
+    return regionSequence.getRegion(interval).getNucleotideAt(position);
   }
 }

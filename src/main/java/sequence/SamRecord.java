@@ -1,5 +1,7 @@
 package sequence;
 
+import lombok.Getter;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,13 +18,21 @@ public class SamRecord {
   private static final Pattern cigarLetterPattern =
       Pattern.compile("[D|M|I|X]", Pattern.CASE_INSENSITIVE);
 
+  @Getter
   private boolean isHeader;
+  @Getter
   private String rname; // Reference sequence NAME
+  @Getter
   private int pos; // 1- based leftmost mapping POSition
+  @Getter
   private int mapq; // MAPping Quality
+  @Getter
   private String cigar; // CIGAR String
+  @Getter
   private String seq; // segment SEQuence
+  @Getter
   private String qual; // ASCII of Phred-scaled base QUALity+33
+  private int cigarLength = -1;
 
   private SamRecord(
       String rname, int pos, int mapq, String cigar, String seq, String qual, boolean isHeader) {
@@ -57,10 +67,6 @@ public class SamRecord {
     return SamRecord.initFromStringArray(subStr, HEADER_TAGS.contains(subStr[0]));
   }
 
-  public boolean isHeader() {
-    return isHeader;
-  }
-
   public Stream<Map.Entry<Integer, Character>> getCigarStream() {
     Matcher matcher = cigarPattern.matcher(cigar);
     final Stream.Builder<Map.Entry<Integer, Character>> sb = Stream.builder();
@@ -76,27 +82,25 @@ public class SamRecord {
     return sb.build();
   }
 
-  public String getRname() {
-    return rname;
+  private int countCigarLength() {
+    return getCigarStream()
+        .filter(
+            integerCharacterEntry ->
+                integerCharacterEntry.getValue().equals('M')
+                    || integerCharacterEntry.getValue().equals('I')
+                    || integerCharacterEntry.getValue().equals('X')
+                    || integerCharacterEntry.getValue().equals('=')
+                    || integerCharacterEntry.getValue().equals('S'))
+        .mapToInt(Map.Entry::getKey)
+        .sum();
   }
 
-  public int getPos() {
-    return pos;
-  }
-
-  public int getMapq() {
-    return mapq;
-  }
-
-  public String getCigar() {
-    return cigar;
-  }
-
-  public String getSeq() {
-    return seq;
-  }
-
-  public String getQual() {
-    return qual;
+  public int getCigarLength() {
+    if (cigarLength != -1) {
+      return cigarLength;
+    } else {
+      cigarLength = countCigarLength();
+      return cigarLength;
+    }
   }
 }

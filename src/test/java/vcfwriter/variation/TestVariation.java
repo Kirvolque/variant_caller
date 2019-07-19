@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-
 public class TestVariation {
 
   @Test
@@ -21,5 +20,4 @@ public class TestVariation {
     Assertions.assertTrue(fieldList.get(6).equals("."));
     Assertions.assertTrue(fieldList.get(7).equals("."));
   }
-
 }
