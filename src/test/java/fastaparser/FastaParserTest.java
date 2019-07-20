@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import sequence.FastaSequence;
 import sequence.ListOfIntervals;
 
-import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ class FastaParserTest {
 
   @BeforeAll
   @DisplayName("Init fastaParser")
-  static void initFastaParser() throws IOException, URISyntaxException {
+  static void initFastaParser() throws URISyntaxException {
     FastaParser fastaParser =
         FastaParser.parseFasta(
             Paths.get(
@@ -46,7 +46,7 @@ class FastaParserTest {
   @DisplayName("Parse unexciting fasta file")
   void parseUnexcitingFastaFile() {
     Assertions.assertThrows(
-        IOException.class, () -> FastaParser.parseFasta(Paths.get("i_dont_exist.fa")));
+        UncheckedIOException.class, () -> FastaParser.parseFasta(Paths.get("i_dont_exist.fa")));
   }
 
   @Test

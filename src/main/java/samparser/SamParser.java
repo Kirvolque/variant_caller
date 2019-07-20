@@ -7,10 +7,7 @@ import samparser.samrecorditerator.SamRecordIterator;
 import sequence.ListOfIntervals;
 import sequence.SamRecord;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +16,14 @@ import java.util.List;
 public class SamParser {
   private SamRecordIterator recordIterator;
 
-  public static SamParser parseSam(Path path) throws IOException {
-    BufferedReader reader =
-        new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile())));
+  public static SamParser parseSam(Path path) {
+    BufferedReader reader;
+    try {
+      reader = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile())));
+    } catch (FileNotFoundException e) {
+      throw new UncheckedIOException(
+          String.format("File %s not found", path.getFileName().toString()), e);
+    }
     return new SamParser(new SamRecordIterable(reader).iterator());
   }
 

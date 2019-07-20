@@ -56,12 +56,10 @@ public class CmdParser {
       cmdParser.parse(args);
     } catch (ParseException exp) {
       System.out.println("Unexpected exception:" + exp.getMessage());
-    } catch (IOException ioExp) {
-      System.out.println("File doesn't exist");
     }
   }
 
-  private void parse(String[] args) throws ParseException, IOException {
+  private void parse(String[] args) throws ParseException {
     Options options = new Options();
     options.addOption("h", "help", false, "Help");
     options.addOption("s", "sam", true, "Path to SAM file");
@@ -106,20 +104,23 @@ public class CmdParser {
     }
   }
 
-  private void work() throws IOException {
+  private void work() {
     Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(bedFilePath);
     FastaParser fastaParser = FastaParser.parseFasta(fastaFilePath);
     SamParser samParser = SamParser.parseSam(samFilePath);
     VariantCaller variantCaller = new VariantCaller();
     bedData.forEach(
-        (chromosomeName, listOfIntervals) -> variantCaller.processIntervals(
-            fastaParser.getNext(listOfIntervals),
-            samParser.getReadsForRegion(chromosomeName, listOfIntervals),
-            listOfIntervals));
+        (chromosomeName, listOfIntervals) ->
+            variantCaller.processIntervals(
+                fastaParser.getNext(listOfIntervals),
+                samParser.getReadsForRegion(chromosomeName, listOfIntervals),
+                listOfIntervals));
 
     try (VcfWriter vcfWriter = new VcfWriter(vcfFilePath)) {
       vcfWriter.writeHeadersOfData();
       vcfWriter.writeData(variantCaller.filterVariations(minAlleleFrequency));
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 }
