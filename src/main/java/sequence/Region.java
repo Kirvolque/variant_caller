@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @EqualsAndHashCode
 @AllArgsConstructor
@@ -15,11 +14,14 @@ public class Region {
   @Getter
   private final int startPosition;
 
-  public Nucleotide getNucleotideAt(int position) {
-    try {
-      return nucleotideList.get(position);
-    } catch (IndexOutOfBoundsException ex) {
-      throw new NoSuchElementException("Current position is not covered by this nucleotideList");
+  private void checkPositionIsCoveredByNucleotideList(int position) {
+    if (position >= nucleotideList.size()) {
+      throw new IndexOutOfBoundsException("Given position is not covered by region");
     }
+  }
+
+  public Nucleotide getNucleotideAt(int position) {
+    checkPositionIsCoveredByNucleotideList(position);
+    return nucleotideList.get(position);
   }
 }
