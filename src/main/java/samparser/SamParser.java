@@ -4,13 +4,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import samparser.samrecorditerator.SamRecordIterable;
 import samparser.samrecorditerator.SamRecordIterator;
-import sequence.ListOfIntervals;
+import sequence.Interval;
 import sequence.SamRecord;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.stream.Stream;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SamParser {
@@ -27,11 +26,11 @@ public class SamParser {
     return new SamParser(new SamRecordIterable(reader).iterator());
   }
 
-  public List<SamRecord> getReadsForRegion(String chromosomeName, ListOfIntervals intervals) {
-    List<SamRecord> suitableSamRecords = new ArrayList<>();
-    while (recordIterator.hasNextForIntervals(chromosomeName, intervals)) {
+  public Stream<SamRecord> getReadsForRegion(String chromosomeName, Interval interval) {
+    Stream.Builder<SamRecord> suitableSamRecords = Stream.builder();
+    while (recordIterator.hasNextForIntervals(chromosomeName, interval)) {
       suitableSamRecords.add(recordIterator.nextForIntervals());
     }
-    return suitableSamRecords;
+    return suitableSamRecords.build();
   }
 }

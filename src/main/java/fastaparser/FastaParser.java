@@ -1,7 +1,5 @@
 package fastaparser;
 
-import fastaparser.fastasequenceiterator.FastaSequenceIterable;
-import fastaparser.fastasequenceiterator.FastaSequenceIterator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import sequence.FastaSequence;
@@ -9,10 +7,13 @@ import sequence.ListOfIntervals;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.NoSuchElementException;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class FastaParser {
-  private FastaSequenceIterator sequenceIterator;
+  private static final String HEADER_START_REGEX = "[>;].*";
+  private static final String HEADER_NAME_REGEX = "[>;](%s)";
+  private Path path;
 
   /**
    * Returns instance of the class.
@@ -21,20 +22,40 @@ public class FastaParser {
    * @return instance of FastaParser to iterate the file
    */
   public static FastaParser parseFasta(Path path) {
-    BufferedReader reader;
-    try {
-      reader = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile())));
-    } catch (FileNotFoundException e) {
-      throw new UncheckedIOException(
-          String.format("File %s not found", path.getFileName().toString()), e);
+    if (!path.toFile().exists()) {
+      throw new NoSuchElementException(
+          String.format("File %s not found", path.getFileName().toString()));
     }
-    return new FastaParser(new FastaSequenceIterable(reader).iterator());
+    return new FastaParser(path);
   }
 
-  public FastaSequence getNext(ListOfIntervals intervals) {
-    if (sequenceIterator.hasNext() && sequenceIterator.hasNext(intervals)) {
-      return sequenceIterator.next();
+  public FastaSequence getRegionsForChromosome(String chromosomeName, ListOfIntervals intervals) {
+
+    String line;
+    StringBuilder currentSequence = new StringBuilder();
+
+    try (BufferedReader reader =
+             new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile())))) {
+      while ((line = reader.readLine()) != null) {
+        if (line.matches(String.format(HEADER_NAME_REGEX, chromosomeName))) {
+          while ((line = reader.readLine()) != null) {
+            if (line.matches(HEADER_START_REGEX)) {
+              break;
+            }
+            currentSequence.append(line);
+          }
+          break;
+        }
+      }
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
-    return null;
+
+    if (currentSequence.toString().equals("")) {
+      throw new NoSuchElementException(
+          "Chromosome is not present or bed/fasta files are not sorted");
+    }
+
+    return FastaSequence.init(chromosomeName, currentSequence.toString(), intervals);
   }
 }

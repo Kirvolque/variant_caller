@@ -1,5 +1,6 @@
 package variantcaller;
 
+import samparser.SamParser;
 import sequence.FastaSequence;
 import sequence.Interval;
 import sequence.ListOfIntervals;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class VariantCaller {
   private int prevSamIndex = 0;
@@ -105,8 +107,8 @@ public class VariantCaller {
   }
 
   private void processSamRecords(
-      FastaSequence fastaSequence, List<SamRecord> samRecordList, Interval interval) {
-    samRecordList.stream()
+      FastaSequence fastaSequence, Stream<SamRecord> samRecordStream, Interval interval) {
+    samRecordStream
         .filter(samRecord -> samRecord.fitInterval(interval))
         .forEach(
             samRecord -> {
@@ -119,9 +121,17 @@ public class VariantCaller {
   }
 
   public void processIntervals(
-      FastaSequence fastaSequence, List<SamRecord> samRecordList, ListOfIntervals listOfIntervals) {
+      FastaSequence fastaSequence,
+      SamParser samParser,
+      ListOfIntervals listOfIntervals,
+      String chromosomeName) {
     listOfIntervals
         .asList()
-        .forEach(interval -> processSamRecords(fastaSequence, samRecordList, interval));
+        .forEach(
+            interval ->
+                processSamRecords(
+                    fastaSequence,
+                    samParser.getReadsForRegion(chromosomeName, interval),
+                    interval));
   }
 }

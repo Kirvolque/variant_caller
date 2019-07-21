@@ -2,11 +2,12 @@ package samparser.samrecorditerator;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import sequence.ListOfIntervals;
+import sequence.Interval;
 import sequence.SamRecord;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Iterator;
 
 @RequiredArgsConstructor
@@ -14,39 +15,30 @@ public class SamRecordIterator implements Iterator<SamRecord> {
   @NonNull
   private BufferedReader reader;
   private SamRecord currentSamRecord;
-  private SamRecord previousSamRecord = null;
-  private boolean previousUsed = false;
 
-  public boolean hasNextForIntervals(String chromosomeName, ListOfIntervals intervals) {
-
-    if (previousSamRecord != null) {
-      currentSamRecord = previousSamRecord;
-      if (previousUsed) {
-        return false;
-      } else {
-        previousUsed = true;
-      }
-    } else {
+  public boolean hasNextForIntervals(String chromosomeName, Interval interval) {
+    if (currentSamRecord == null) {
       String line;
       try {
-        if ((line = reader.readLine()) != null) {
-          currentSamRecord = SamRecord.init(line);
-        } else {
-          return false;
-        }
+        line = reader.readLine();
       } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+      if (line != null) {
+        currentSamRecord = SamRecord.init(line);
+      } else {
         return false;
       }
     }
-    if (!currentSamRecord.getRname().equals(chromosomeName)) {
-      previousSamRecord = currentSamRecord;
-      return false;
-    }
-    return intervals.asList().stream().anyMatch(interval -> currentSamRecord.fitInterval(interval));
+
+    return currentSamRecord.getRname().equals(chromosomeName)
+        && currentSamRecord.fitInterval(interval);
   }
 
   public SamRecord nextForIntervals() {
-    return currentSamRecord;
+    SamRecord result = currentSamRecord;
+    currentSamRecord = null;
+    return result;
   }
 
   @Override
