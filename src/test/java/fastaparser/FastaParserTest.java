@@ -8,13 +8,9 @@ import org.junit.jupiter.api.Test;
 import sequence.FastaSequence;
 import sequence.ListOfIntervals;
 
-import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 class FastaParserTest {
   private static final String FASTA_FILE_NAME = "ex.fa";
@@ -39,14 +35,15 @@ class FastaParserTest {
                 Objects.requireNonNull(
                     FastaParserTest.class.getClassLoader().getResource(BED_FILE_NAME))
                     .toURI()));
-    bedData.forEach((s, intervals) -> fastaSequenceList.add(fastaParser.getNext(intervals)));
+    bedData.forEach(
+        (s, intervals) -> fastaSequenceList.add(fastaParser.getRegionsForChromosome(s, intervals)));
   }
 
   @Test
   @DisplayName("Parse unexciting fasta file")
   void parseUnexcitingFastaFile() {
     Assertions.assertThrows(
-        UncheckedIOException.class, () -> FastaParser.parseFasta(Paths.get("i_dont_exist.fa")));
+        NoSuchElementException.class, () -> FastaParser.parseFasta(Paths.get("i_dont_exist.fa")));
   }
 
   @Test

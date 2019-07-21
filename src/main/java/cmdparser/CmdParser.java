@@ -99,12 +99,12 @@ public class CmdParser {
         setBedFilePath(Paths.get(bedFilePath));
         setVcfFilePath(vcfFilePath);
         setMinAlleleFrequency(minAlleleFrequency);
-        work();
+        executeVariantCalling();
       }
     }
   }
 
-  private void work() {
+  private void executeVariantCalling() {
     Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(bedFilePath);
     FastaParser fastaParser = FastaParser.parseFasta(fastaFilePath);
     SamParser samParser = SamParser.parseSam(samFilePath);
@@ -112,9 +112,10 @@ public class CmdParser {
     bedData.forEach(
         (chromosomeName, listOfIntervals) ->
             variantCaller.processIntervals(
-                fastaParser.getNext(listOfIntervals),
-                samParser.getReadsForRegion(chromosomeName, listOfIntervals),
-                listOfIntervals));
+                fastaParser.getRegionsForChromosome(chromosomeName, listOfIntervals),
+                samParser,
+                listOfIntervals,
+                chromosomeName));
 
     try (VcfWriter vcfWriter = new VcfWriter(vcfFilePath)) {
       vcfWriter.writeHeadersOfData();
