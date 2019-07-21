@@ -34,13 +34,13 @@ class VariantCallerTest {
                     VariantCallerTest.class.getClassLoader().getResource(BED_FILE_NAME))
                     .toURI()));
     FastaParser fastaParser =
-        FastaParser.parseFasta(
+        FastaParser.init(
             Paths.get(
                 Objects.requireNonNull(
                     VariantCallerTest.class.getClassLoader().getResource(FASTA_FILE_NAME))
                     .toURI()));
     SamParser samParser =
-        SamParser.parseSam(
+        SamParser.init(
             Paths.get(
                 Objects.requireNonNull(
                     VariantCallerTest.class.getClassLoader().getResource("ex.sam"))

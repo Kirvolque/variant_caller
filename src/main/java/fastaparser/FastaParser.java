@@ -21,7 +21,7 @@ public class FastaParser {
    * @param path path to the file needed to be parsed
    * @return instance of FastaParser to iterate the file
    */
-  public static FastaParser parseFasta(Path path) {
+  public static FastaParser init(Path path) {
     if (!path.toFile().exists()) {
       throw new NoSuchElementException(
           String.format("File %s not found", path.getFileName().toString()));

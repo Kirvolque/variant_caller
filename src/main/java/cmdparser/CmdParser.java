@@ -106,8 +106,8 @@ public class CmdParser {
 
   private void executeVariantCalling() {
     Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(bedFilePath);
-    FastaParser fastaParser = FastaParser.parseFasta(fastaFilePath);
-    SamParser samParser = SamParser.parseSam(samFilePath);
+    FastaParser fastaParser = FastaParser.init(fastaFilePath);
+    SamParser samParser = SamParser.init(samFilePath);
     VariantCaller variantCaller = new VariantCaller();
     bedData.forEach(
         (chromosomeName, listOfIntervals) ->

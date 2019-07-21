@@ -24,7 +24,7 @@ class FastaParserTest {
   @DisplayName("Init fastaParser")
   static void initFastaParser() throws URISyntaxException {
     FastaParser fastaParser =
-        FastaParser.parseFasta(
+        FastaParser.init(
             Paths.get(
                 Objects.requireNonNull(
                     FastaParserTest.class.getClassLoader().getResource(FASTA_FILE_NAME))
@@ -43,7 +43,7 @@ class FastaParserTest {
   @DisplayName("Parse unexciting fasta file")
   void parseUnexcitingFastaFile() {
     Assertions.assertThrows(
-        NoSuchElementException.class, () -> FastaParser.parseFasta(Paths.get("i_dont_exist.fa")));
+        NoSuchElementException.class, () -> FastaParser.init(Paths.get("i_dont_exist.fa")));
   }
 
   @Test

@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 public class SamParser {
   private SamRecordIterator recordIterator;
 
-  public static SamParser parseSam(Path path) {
+  public static SamParser init(Path path) {
     BufferedReader reader;
     try {
       reader = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile())));
