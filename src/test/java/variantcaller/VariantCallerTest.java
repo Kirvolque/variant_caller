@@ -10,7 +10,6 @@ import samparser.SamParser;
 import sequence.ListOfIntervals;
 import vcfwriter.variation.Variation;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
@@ -27,7 +26,7 @@ class VariantCallerTest {
   private static List<Variation> variationList;
 
   @BeforeAll
-  static void init() throws URISyntaxException, IOException {
+  static void init() throws URISyntaxException {
     Map<String, ListOfIntervals> bedData =
         BedParser.collectIntervals(
             Paths.get(
