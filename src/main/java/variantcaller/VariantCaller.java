@@ -13,7 +13,6 @@ import vcfwriter.variation.Variation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -69,14 +68,8 @@ public class VariantCaller {
   private void incrementAlleleDepth(
       SamRecord samRecord, FastaSequence fastaSequence, Interval interval) {
     StringBuilder refBuilder = new StringBuilder();
-    try {
-      for (int i = prevFastaIndex - interval.getBegin();
-           i < fastaIndex - interval.getBegin();
-           i++) {
-        refBuilder.append(fastaSequence.getNucleotide(interval, i));
-      }
-    } catch (NoSuchElementException ex) {
-
+    for (int i = prevFastaIndex - interval.getBegin(); i < fastaIndex - interval.getBegin(); i++) {
+      refBuilder.append(fastaSequence.getNucleotide(interval, i));
     }
 
     String ref = refBuilder.toString();
