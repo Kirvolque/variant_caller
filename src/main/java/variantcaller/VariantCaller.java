@@ -1,5 +1,8 @@
 package variantcaller;
 
+import fastaparser.FastaParser;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import samparser.SamParser;
 import sequence.FastaSequence;
 import sequence.Interval;
@@ -14,12 +17,16 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@RequiredArgsConstructor
 public class VariantCaller {
+  @NonNull
+  private final SamParser samParser;
+  @NonNull
+  private final FastaParser fastaParser;
   private int prevSamIndex = 0;
   private int prevFastaIndex = 0;
   private int samIndex = 0;
   private int fastaIndex = 0;
-
   private Map<Variation, Integer> alleleDepth = new HashMap<>();
   private Map<String, Map<Integer, Integer>> totalDepth = new HashMap<>();
 
@@ -120,17 +127,13 @@ public class VariantCaller {
             });
   }
 
-  public void processIntervals(
-      FastaSequence fastaSequence,
-      SamParser samParser,
-      ListOfIntervals listOfIntervals,
-      String chromosomeName) {
+  public void processIntervals(String chromosomeName, ListOfIntervals listOfIntervals) {
     listOfIntervals
         .asList()
         .forEach(
             interval ->
                 processSamRecords(
-                    fastaSequence,
+                    fastaParser.getRegionsForChromosome(chromosomeName, listOfIntervals),
                     samParser.getReadsForRegion(chromosomeName, interval),
                     interval));
   }

@@ -108,14 +108,8 @@ public class CmdParser {
     Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(bedFilePath);
     FastaParser fastaParser = FastaParser.init(fastaFilePath);
     SamParser samParser = SamParser.init(samFilePath);
-    VariantCaller variantCaller = new VariantCaller();
-    bedData.forEach(
-        (chromosomeName, listOfIntervals) ->
-            variantCaller.processIntervals(
-                fastaParser.getRegionsForChromosome(chromosomeName, listOfIntervals),
-                samParser,
-                listOfIntervals,
-                chromosomeName));
+    VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
+    bedData.forEach(variantCaller::processIntervals);
 
     try (VcfWriter vcfWriter = new VcfWriter(vcfFilePath)) {
       vcfWriter.writeHeadersOfData();

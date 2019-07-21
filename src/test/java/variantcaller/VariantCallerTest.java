@@ -22,7 +22,6 @@ class VariantCallerTest {
   private static final String CHROMOSOME_NAME_2 = "chr2";
   private static final String FASTA_FILE_NAME = "ex.fa";
   private static final String BED_FILE_NAME = "ex.bed";
-  private static VariantCaller variantCaller = new VariantCaller();
   private static List<Variation> variationList;
 
   @BeforeAll
@@ -46,13 +45,9 @@ class VariantCallerTest {
                     VariantCallerTest.class.getClassLoader().getResource("ex.sam"))
                     .toURI()));
 
-    bedData.forEach(
-        (chromosomeName, listOfIntervals) ->
-            variantCaller.processIntervals(
-                fastaParser.getRegionsForChromosome(chromosomeName, listOfIntervals),
-                samParser,
-                listOfIntervals,
-                chromosomeName));
+
+    VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
+    bedData.forEach(variantCaller::processIntervals);
     variationList = variantCaller.filterVariations(minAlleleFrequency);
   }
 
