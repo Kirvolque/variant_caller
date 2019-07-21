@@ -10,7 +10,6 @@ import sequence.ListOfIntervals;
 import variantcaller.VariantCaller;
 import vcfwriter.VcfWriter;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Path;
@@ -105,17 +104,15 @@ public class CmdParser {
   }
 
   private void executeVariantCalling() {
-    Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(bedFilePath);
-    FastaParser fastaParser = FastaParser.init(fastaFilePath);
-    SamParser samParser = SamParser.init(samFilePath);
-    VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
-    bedData.forEach(variantCaller::processIntervals);
+    try (VcfWriter vcfWriter = VcfWriter.init(vcfFilePath)) {
+      Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(bedFilePath);
+      FastaParser fastaParser = FastaParser.init(fastaFilePath);
+      SamParser samParser = SamParser.init(samFilePath);
+      VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
 
-    try (VcfWriter vcfWriter = new VcfWriter(vcfFilePath)) {
-      vcfWriter.writeHeadersOfData();
-      vcfWriter.writeData(variantCaller.filterVariations(minAlleleFrequency));
-    } catch (IOException e) {
-      e.printStackTrace();
+      bedData.forEach(variantCaller::processIntervals);
+
+      vcfWriter.writeVcf(variantCaller.filterVariations(minAlleleFrequency));
     }
   }
 }
