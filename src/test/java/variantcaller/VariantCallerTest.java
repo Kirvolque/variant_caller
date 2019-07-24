@@ -33,17 +33,17 @@ class VariantCallerTest {
                         VariantCallerTest.class.getClassLoader().getResource(BED_FILE_NAME))
                     .toURI()));
     try (SamParser samParser =
-        SamParser.init(
-            Paths.get(
-                Objects.requireNonNull(
-                        VariantCallerTest.class.getClassLoader().getResource("ex.sam"))
-                    .toURI()))) {
-      FastaParser fastaParser =
-          FastaParser.init(
-              Paths.get(
-                  Objects.requireNonNull(
-                          VariantCallerTest.class.getClassLoader().getResource(FASTA_FILE_NAME))
-                      .toURI()));
+            SamParser.init(
+                Paths.get(
+                    Objects.requireNonNull(
+                            VariantCallerTest.class.getClassLoader().getResource("ex.sam"))
+                        .toURI()));
+        FastaParser fastaParser =
+            FastaParser.init(
+                Paths.get(
+                    Objects.requireNonNull(
+                            VariantCallerTest.class.getClassLoader().getResource(FASTA_FILE_NAME))
+                        .toURI()))) {
 
       VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
       bedData.forEach(variantCaller::processIntervals);

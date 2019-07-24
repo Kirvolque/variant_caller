@@ -10,10 +10,11 @@ import java.nio.file.Path;
 import java.util.NoSuchElementException;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class FastaParser {
+public class FastaParser implements AutoCloseable {
   private static final String HEADER_START_REGEX = "[>;].*";
   private static final String HEADER_NAME_REGEX = "[>;](%s)";
-  private Path path;
+  private final FileInputStream fInput;
+  private BufferedReader reader;
 
   /**
    * Returns instance of the class.
@@ -22,20 +23,19 @@ public class FastaParser {
    * @return instance of FastaParser to iterate the file
    */
   public static FastaParser init(Path path) {
-    if (!path.toFile().exists()) {
+    try {
+      FileInputStream fIn = new FileInputStream(path.toFile());
+      return new FastaParser(fIn, new BufferedReader(new InputStreamReader(fIn)));
+    } catch (FileNotFoundException e) {
       throw new NoSuchElementException(
           String.format("File %s not found", path.getFileName().toString()));
     }
-    return new FastaParser(path);
   }
 
   public FastaSequence getRegionsForChromosome(String chromosomeName, ListOfIntervals intervals) {
-
     String line;
     StringBuilder currentSequence = new StringBuilder();
-
-    try (BufferedReader reader =
-             new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile())))) {
+    try {
       while ((line = reader.readLine()) != null) {
         if (line.matches(String.format(HEADER_NAME_REGEX, chromosomeName))) {
           while ((line = reader.readLine()) != null) {
@@ -47,6 +47,8 @@ public class FastaParser {
           break;
         }
       }
+      fInput.getChannel().position(0);
+      reader = new BufferedReader(new InputStreamReader(fInput));
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
@@ -57,5 +59,15 @@ public class FastaParser {
     }
 
     return FastaSequence.init(chromosomeName, currentSequence.toString(), intervals);
+  }
+
+  @Override
+  public void close() {
+    try {
+      fInput.close();
+      reader.close();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 }
