@@ -1,8 +1,8 @@
 package bedparser;
 
+import sequence.BedData;
 import sequence.BedRecord;
 import sequence.Interval;
-import sequence.ListOfIntervals;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -31,13 +31,7 @@ public class BedParser {
     return collectedMap;
   }
 
-  public static Map<String, ListOfIntervals> collectIntervals(Path filePath) {
-    Map<String, List<Interval>> collectedMap = parseBed(filePath);
-
-    Map<String, ListOfIntervals> result = new LinkedHashMap<>();
-    for (Map.Entry<String, List<Interval>> item : collectedMap.entrySet()) {
-      result.put(item.getKey(), new ListOfIntervals(item.getValue()));
-    }
-    return result;
+  public static BedData collectIntervals(Path filePath) {
+    return BedData.init(parseBed(filePath));
   }
 }

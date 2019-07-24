@@ -5,12 +5,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import sequence.BedData;
 import sequence.FastaSequence;
-import sequence.ListOfIntervals;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 class FastaParserTest {
   private static final String FASTA_FILE_NAME = "ex.fa";
@@ -27,16 +30,19 @@ class FastaParserTest {
         FastaParser.init(
             Paths.get(
                 Objects.requireNonNull(
-                    FastaParserTest.class.getClassLoader().getResource(FASTA_FILE_NAME))
+                        FastaParserTest.class.getClassLoader().getResource(FASTA_FILE_NAME))
                     .toURI()));
-    Map<String, ListOfIntervals> bedData =
+    BedData bedData =
         BedParser.collectIntervals(
             Paths.get(
                 Objects.requireNonNull(
-                    FastaParserTest.class.getClassLoader().getResource(BED_FILE_NAME))
+                        FastaParserTest.class.getClassLoader().getResource(BED_FILE_NAME))
                     .toURI()));
-    bedData.forEach(
-        (s, intervals) -> fastaSequenceList.add(fastaParser.getRegionsForChromosome(s, intervals)));
+    bedData
+        .getData()
+        .forEach(
+            (s, intervals) ->
+                fastaSequenceList.add(fastaParser.getRegionsForChromosome(s, intervals)));
   }
 
   @Test

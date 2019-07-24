@@ -7,14 +7,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import samparser.SamParser;
-import sequence.ListOfIntervals;
+import sequence.BedData;
 import vcfwriter.variation.Variation;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 class VariantCallerTest {
   private static final Double minAlleleFrequency = 0.0;
@@ -26,7 +26,7 @@ class VariantCallerTest {
 
   @BeforeAll
   static void init() throws URISyntaxException {
-    Map<String, ListOfIntervals> bedData =
+    BedData bedData =
         BedParser.collectIntervals(
             Paths.get(
                 Objects.requireNonNull(
@@ -46,8 +46,11 @@ class VariantCallerTest {
                         .toURI()))) {
 
       VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
-      bedData.forEach(variantCaller::processIntervals);
-      variationList = variantCaller.filterVariations(minAlleleFrequency);
+      variationList =
+          variantCaller
+              .processIntervalsForBedIntervals(bedData)
+              .filter(variation -> variantCaller.filterVariation(variation, minAlleleFrequency))
+              .collect(Collectors.toList());
     }
   }
 

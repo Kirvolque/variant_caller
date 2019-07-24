@@ -6,15 +6,17 @@ import lombok.AccessLevel;
 import lombok.Setter;
 import org.apache.commons.cli.*;
 import samparser.SamParser;
-import sequence.ListOfIntervals;
+import sequence.BedData;
 import variantcaller.VariantCaller;
 import vcfwriter.VcfWriter;
+import vcfwriter.variation.Variation;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Setter(AccessLevel.PRIVATE)
 public class CmdParser {
@@ -104,7 +106,7 @@ public class CmdParser {
   }
 
   private void executeVariantCalling() {
-    Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(bedFilePath);
+    BedData bedData = BedParser.collectIntervals(bedFilePath);
 
     try (VcfWriter vcfWriter = VcfWriter.init(vcfFilePath);
         SamParser samParser = SamParser.init(samFilePath);
@@ -112,9 +114,13 @@ public class CmdParser {
 
       VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
 
-      bedData.forEach(variantCaller::processIntervals);
+      List<Variation> variationList =
+          variantCaller
+              .processIntervalsForBedIntervals(bedData)
+              .filter(variation -> variantCaller.filterVariation(variation, minAlleleFrequency))
+              .collect(Collectors.toList());
 
-      vcfWriter.writeVcf(variantCaller.filterVariations(minAlleleFrequency));
+      vcfWriter.writeVcf(variationList);
     }
   }
 }

@@ -4,24 +4,17 @@ import fastaparser.FastaParser;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import samparser.SamParser;
-import sequence.FastaSequence;
-import sequence.Interval;
-import sequence.ListOfIntervals;
-import sequence.SamRecord;
+import sequence.*;
 import vcfwriter.variation.Variation;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 public class VariantCaller {
-  @NonNull
-  private final SamParser samParser;
-  @NonNull
-  private final FastaParser fastaParser;
+  @NonNull private final SamParser samParser;
+  @NonNull private final FastaParser fastaParser;
   private int prevSamIndex = 0;
   private int prevFastaIndex = 0;
   private int samIndex = 0;
@@ -50,19 +43,16 @@ public class VariantCaller {
     }
   }
 
-  private Double countAF(Map.Entry<Variation, Integer> alleleDepthPair) {
-    String chromName = alleleDepthPair.getKey().getChrom();
-    int chromPos = alleleDepthPair.getKey().getPos();
-    Double ad = alleleDepthPair.getValue().doubleValue();
+  private Double countAF(Variation variation) {
+    String chromName = variation.getChrom();
+    int chromPos = variation.getPos();
+    Double ad = alleleDepth.get(variation).doubleValue();
     Double td = Double.valueOf(totalDepth.get(chromName).get(chromPos));
     return ad / td;
   }
 
-  public List<Variation> filterVariations(Double minAlleleFrequency) {
-    return alleleDepth.entrySet().stream()
-        .filter(x -> countAF(x) >= minAlleleFrequency)
-        .map(Map.Entry::getKey)
-        .collect(Collectors.toList());
+  public boolean filterVariation(Variation variation, Double minAlleleFrequency) {
+    return countAF(variation) >= minAlleleFrequency;
   }
 
   private void incrementAlleleDepth(
@@ -120,7 +110,7 @@ public class VariantCaller {
             });
   }
 
-  public void processIntervals(String chromosomeName, ListOfIntervals listOfIntervals) {
+  private void processIntervals(String chromosomeName, ListOfIntervals listOfIntervals) {
     listOfIntervals
         .asList()
         .forEach(
@@ -129,5 +119,10 @@ public class VariantCaller {
                     fastaParser.getRegionsForChromosome(chromosomeName, listOfIntervals),
                     samParser.getReadsForRegion(chromosomeName, interval),
                     interval));
+  }
+
+  public Stream<Variation> processIntervalsForBedIntervals(BedData bedData) {
+    bedData.getData().forEach(this::processIntervals);
+    return alleleDepth.keySet().stream();
   }
 }
