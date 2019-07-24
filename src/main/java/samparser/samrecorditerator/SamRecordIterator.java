@@ -12,8 +12,7 @@ import java.util.Iterator;
 
 @RequiredArgsConstructor
 public class SamRecordIterator implements Iterator<SamRecord> {
-  @NonNull
-  private BufferedReader reader;
+  @NonNull private BufferedReader reader;
   private SamRecord currentSamRecord;
 
   public boolean hasNextForIntervals(String chromosomeName, Interval interval) {
@@ -58,5 +57,13 @@ public class SamRecordIterator implements Iterator<SamRecord> {
   @Override
   public void remove() {
     throw new UnsupportedOperationException("Remove not supported");
+  }
+
+  public void close() {
+    try {
+      reader.close();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 }

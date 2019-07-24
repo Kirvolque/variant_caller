@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class SamParser {
+public class SamParser implements AutoCloseable {
   private SamRecordIterator recordIterator;
 
   public static SamParser init(Path path) {
@@ -32,5 +32,10 @@ public class SamParser {
       suitableSamRecords.add(recordIterator.nextForIntervals());
     }
     return suitableSamRecords.build();
+  }
+
+  @Override
+  public void close() {
+    recordIterator.close();
   }
 }

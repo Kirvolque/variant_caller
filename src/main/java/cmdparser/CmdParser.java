@@ -104,10 +104,11 @@ public class CmdParser {
   }
 
   private void executeVariantCalling() {
-    try (VcfWriter vcfWriter = VcfWriter.init(vcfFilePath)) {
-      Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(bedFilePath);
+    Map<String, ListOfIntervals> bedData = BedParser.collectIntervals(bedFilePath);
+
+    try (VcfWriter vcfWriter = VcfWriter.init(vcfFilePath);
+        SamParser samParser = SamParser.init(samFilePath)) {
       FastaParser fastaParser = FastaParser.init(fastaFilePath);
-      SamParser samParser = SamParser.init(samFilePath);
       VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
 
       bedData.forEach(variantCaller::processIntervals);

@@ -30,25 +30,25 @@ class VariantCallerTest {
         BedParser.collectIntervals(
             Paths.get(
                 Objects.requireNonNull(
-                    VariantCallerTest.class.getClassLoader().getResource(BED_FILE_NAME))
+                        VariantCallerTest.class.getClassLoader().getResource(BED_FILE_NAME))
                     .toURI()));
-    FastaParser fastaParser =
-        FastaParser.init(
-            Paths.get(
-                Objects.requireNonNull(
-                    VariantCallerTest.class.getClassLoader().getResource(FASTA_FILE_NAME))
-                    .toURI()));
-    SamParser samParser =
+    try (SamParser samParser =
         SamParser.init(
             Paths.get(
                 Objects.requireNonNull(
-                    VariantCallerTest.class.getClassLoader().getResource("ex.sam"))
-                    .toURI()));
+                        VariantCallerTest.class.getClassLoader().getResource("ex.sam"))
+                    .toURI()))) {
+      FastaParser fastaParser =
+          FastaParser.init(
+              Paths.get(
+                  Objects.requireNonNull(
+                          VariantCallerTest.class.getClassLoader().getResource(FASTA_FILE_NAME))
+                      .toURI()));
 
-
-    VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
-    bedData.forEach(variantCaller::processIntervals);
-    variationList = variantCaller.filterVariations(minAlleleFrequency);
+      VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
+      bedData.forEach(variantCaller::processIntervals);
+      variationList = variantCaller.filterVariations(minAlleleFrequency);
+    }
   }
 
   @Test
