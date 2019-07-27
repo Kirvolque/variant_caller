@@ -4,7 +4,11 @@ import fastaparser.FastaParser;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import samparser.SamParser;
-import sequence.*;
+import sequence.BedData;
+import sequence.FastaSequence;
+import sequence.Interval;
+import sequence.ListOfIntervals;
+import sequence.SamRecord;
 import vcfwriter.variation.Variation;
 
 import java.util.HashMap;
@@ -121,8 +125,14 @@ public class VariantCaller {
                     interval));
   }
 
-  public Stream<Variation> processIntervalsForBedIntervals(BedData bedData) {
-    bedData.getData().forEach(this::processIntervals);
+  public Stream<Variation> callVariationsForIntervals(BedData bedData) {
+    bedData
+        .getChromosomeListOfIntervalsTuples()
+        .forEach(
+            chromosomeListOfIntervalsTuple ->
+                this.processIntervals(
+                    chromosomeListOfIntervalsTuple.getChromosome(),
+                    chromosomeListOfIntervalsTuple.getListOfIntervals()));
     return alleleDepth.keySet().stream();
   }
 }

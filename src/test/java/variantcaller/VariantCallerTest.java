@@ -48,7 +48,7 @@ class VariantCallerTest {
       VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
       variationList =
           variantCaller
-              .processIntervalsForBedIntervals(bedData)
+              .callVariationsForIntervals(bedData)
               .filter(variation -> variantCaller.filterVariation(variation, minAlleleFrequency))
               .collect(Collectors.toList());
     }

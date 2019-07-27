@@ -4,7 +4,12 @@ import bedparser.BedParser;
 import fastaparser.FastaParser;
 import lombok.AccessLevel;
 import lombok.Setter;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import samparser.SamParser;
 import sequence.BedData;
 import variantcaller.VariantCaller;
@@ -116,7 +121,7 @@ public class CmdParser {
 
       List<Variation> variationList =
           variantCaller
-              .processIntervalsForBedIntervals(bedData)
+              .callVariationsForIntervals(bedData)
               .filter(variation -> variantCaller.filterVariation(variation, minAlleleFrequency))
               .collect(Collectors.toList());
 
