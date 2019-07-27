@@ -1,20 +1,14 @@
 package sequence;
 
+import lombok.AllArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 public class ListOfIntervals {
   private List<Interval> listOfIntervals;
-
-  /**
-   * Class constructor.
-   *
-   * @param listOfIntervals list with intervals
-   */
-  public ListOfIntervals(List<Interval> listOfIntervals) {
-    this.listOfIntervals = listOfIntervals;
-  }
 
   /**
    * Gets the list of intervals.
@@ -58,8 +52,7 @@ public class ListOfIntervals {
    * Gets interval from the listOfIntervals by the position it covers.
    *
    * @param position position to be found in each of the intervals
-   * @return interval from the listOfIntervals if this position contains
-   * in any of the intervals
+   * @return interval from the listOfIntervals if this position contains in any of the intervals
    */
   public Optional<Interval> getIntervalByPosition(int position) {
     return listOfIntervals.stream().filter(i -> i.contains(position)).findFirst();

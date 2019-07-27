@@ -1,45 +1,30 @@
 package cmdparser;
 
+import bedparser.BedParser;
 import fastaparser.FastaParser;
+import lombok.AccessLevel;
+import lombok.Setter;
 import org.apache.commons.cli.*;
 import samparser.SamParser;
-import sequence.FastaSequence;
+import sequence.BedData;
 import variantcaller.VariantCaller;
 import vcfwriter.VcfWriter;
+import vcfwriter.variation.Variation;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
+@Setter(AccessLevel.PRIVATE)
 public class CmdParser {
-
-  private static String fastaFilePath;
-  private static Path samFilePath;
-  private static Path bedFilePath;
-  private static String vcfFilePath;
-  private static Double minAlleleFrequency;
-
-  private static void setFastaFilePath(String fastaFilePath) {
-    CmdParser.fastaFilePath = fastaFilePath;
-  }
-
-  private static void setSamFilePath(Path samFilePath) {
-    CmdParser.samFilePath = samFilePath;
-  }
-
-  private static void setBedFilePath(Path bedFilePath) {
-    CmdParser.bedFilePath = bedFilePath;
-  }
-
-  private static void setVcfFilePath(String vcfFilePath) {
-    CmdParser.vcfFilePath = vcfFilePath;
-  }
-
-  private static void setMinAlleleFrequency(Double minAlleleFrequency) {
-    CmdParser.minAlleleFrequency = minAlleleFrequency;
-  }
+  private Path fastaFilePath;
+  private Path samFilePath;
+  private Path bedFilePath;
+  private String vcfFilePath;
+  private Double minAlleleFrequency;
 
   private static void printHelp(
       final Options options,
@@ -66,8 +51,16 @@ public class CmdParser {
     writer.flush();
   }
 
-  public static void parse(String[] args) throws ParseException, IOException {
+  public static void main(final String... args) {
+    try {
+      CmdParser cmdParser = new CmdParser();
+      cmdParser.parse(args);
+    } catch (ParseException exp) {
+      System.out.println("Unexpected exception:" + exp.getMessage());
+    }
+  }
 
+  private void parse(String[] args) throws ParseException {
     Options options = new Options();
     options.addOption("h", "help", false, "Help");
     options.addOption("s", "sam", true, "Path to SAM file");
@@ -102,33 +95,32 @@ public class CmdParser {
           || minAlleleFrequency == null) {
         System.out.println("Wrong param for filepath option");
       } else {
-        setFastaFilePath(fastaFilePath);
+        setFastaFilePath(Paths.get(fastaFilePath));
         setSamFilePath(Paths.get(samFilePath));
         setBedFilePath(Paths.get(bedFilePath));
         setVcfFilePath(vcfFilePath);
         setMinAlleleFrequency(minAlleleFrequency);
-        work();
+        executeVariantCalling();
       }
     }
   }
 
-  private static void work() throws IOException {
-    FastaSequence fastaSequence = FastaParser.parseFasta(fastaFilePath, bedFilePath);
-    VariantCaller variantCaller = new VariantCaller();
-    variantCaller.processSamRecords(fastaSequence, SamParser.parseSam(samFilePath));
-    VcfWriter vcfWriter = new VcfWriter(vcfFilePath);
-    vcfWriter.writeHeadersOfData();
-    vcfWriter.writeData(variantCaller.filterVariations(minAlleleFrequency));
-    vcfWriter.close();
-  }
+  private void executeVariantCalling() {
+    BedData bedData = BedParser.collectIntervals(bedFilePath);
 
-  public static void main(final String... args) {
-    try {
-      parse(args);
-    } catch (ParseException exp) {
-      System.out.println("Unexpected exception:" + exp.getMessage());
-    } catch (IOException ioExp) {
-      System.out.println("File doesn't exist");
+    try (VcfWriter vcfWriter = VcfWriter.init(vcfFilePath);
+        SamParser samParser = SamParser.init(samFilePath);
+        FastaParser fastaParser = FastaParser.init(fastaFilePath)) {
+
+      VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
+
+      List<Variation> variationList =
+          variantCaller
+              .processIntervalsForBedIntervals(bedData)
+              .filter(variation -> variantCaller.filterVariation(variation, minAlleleFrequency))
+              .collect(Collectors.toList());
+
+      vcfWriter.writeVcf(variationList);
     }
   }
 }

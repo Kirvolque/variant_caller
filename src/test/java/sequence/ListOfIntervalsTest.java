@@ -44,8 +44,10 @@ class ListOfIntervalsTest {
 
   @Test
   void getNonexistentIntervalByIndex() {
-    Assertions.assertThrows(IndexOutOfBoundsException.class, () -> listOfIntervals.getIntervalByIndex(-1));
-    Assertions.assertThrows(IndexOutOfBoundsException.class, () -> listOfIntervals.getIntervalByIndex(5));
+    Assertions.assertThrows(
+        IndexOutOfBoundsException.class, () -> listOfIntervals.getIntervalByIndex(-1));
+    Assertions.assertThrows(
+        IndexOutOfBoundsException.class, () -> listOfIntervals.getIntervalByIndex(5));
   }
 
   @Test

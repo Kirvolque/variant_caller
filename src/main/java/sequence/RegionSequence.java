@@ -1,78 +1,65 @@
 package sequence;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RegionSequence {
+  private static final String INTERVAL_MISS_EXCEPTION_MESSAGE =
+      "Current position is not covered by any region";
+  private static final String INCORRECT_INPUT_EXCEPTION_MESSAGE =
+      "Nucleotides do not fit intervals";
+  private static final String INTERVAL_IS_NOT_PRESENT_EXCEPTION_MESSAGE =
+      "No region fit interval with this position";
+  @Getter
   private final ListOfIntervals listOfIntervals;
+  @Getter
   private final Map<Interval, String> nucleotidesIntervals;
 
   /**
-   * Private constructor.
-   * Use createInstance() method to get instance of the class.
+   * This method slices the passed string, making the substrings for each of the intervals from the
+   * ListOfIntervals.
    *
-   * @param listOfIntervals      ListOfIntervals that contains intervals for which the string was cut
-   * @param nucleotidesIntervals map with intervals and nucleotide substrings in each interval
-   */
-  private RegionSequence(ListOfIntervals listOfIntervals, Map<Interval, String> nucleotidesIntervals) {
-    this.listOfIntervals = listOfIntervals;
-    this.nucleotidesIntervals = nucleotidesIntervals;
-  }
-
-  /**
-   * This method slices the passed string,
-   * making the substrings for each of the intervals
-   * from the ListOfIntervals.
-   * <p>
-   * String with nucleotides must fit passed interval list.
+   * <p>String with nucleotides must fit passed interval list.
    *
-   * @param intervals   ListOfIntervals that contains intervals
-   *                    for which the string will be cut
+   * @param intervals ListOfIntervals that contains intervals for which the string will be cut
    * @param nucleotides string with nucleotides
    * @return instance of RegionSequence
-   * @throws RuntimeException if nucleotides string is bigger
-   *                          than intervals it should be covered with
+   * @throws NoSuchElementException if nucleotides string is bigger than intervals it should be
+   *     covered with
    */
   public static RegionSequence createInstance(ListOfIntervals intervals, String nucleotides) {
     if (intervals.getLength() > nucleotides.length()) {
-      throw new RuntimeException("Nucleotides do not fit intervals");
+      throw new NoSuchElementException(INCORRECT_INPUT_EXCEPTION_MESSAGE);
     }
 
-    Map<Interval, String> nucleotidesIntervals = intervals.asList().stream().collect(
-        Collectors.toMap(interval -> interval,
-            interval -> nucleotides.substring(interval.getBegin(), interval.getEnd() + 1)));
+    Map<Interval, String> nucleotidesIntervals =
+        intervals.asList().stream()
+            .collect(
+                Collectors.toMap(
+                    interval -> interval,
+                    interval -> nucleotides.substring(interval.getBegin(), interval.getEnd() + 1)));
 
     return new RegionSequence(intervals, nucleotidesIntervals);
   }
 
   /**
-   * Gets the list of intervals representing intervals which
-   * are covered by current regionSequence class.
-   *
-   * @return a list of intervals
-   */
-  public ListOfIntervals getIntervalList() {
-    return listOfIntervals;
-  }
-
-  /**
-   * Gets the map with intervals and strings with nucleotides in this intervals.
-   *
-   * @return a map with intervals and strings
-   */
-  public Map<Interval, String> getNucleotidesIntervals() {
-    return nucleotidesIntervals;
-  }
-
-  /**
-   * Returns nucleotide in the given position.
-   *
+   * @deprecated Returns nucleotide in the given position.
    * @param position position to be found in the nucleotidesIntervals
    * @return nucleotide in this position if it exists
-   * @throws RuntimeException if position is not covered by any region
+   * @throws NoSuchElementException if position is not covered by any region
    */
+  @Deprecated
   public Nucleotide getNucleotideAt(int position) {
-    Interval interval = listOfIntervals.getIntervalByPosition(position).orElseThrow(() -> new RuntimeException("Current position is not covered by any region"));
+    Interval interval =
+        listOfIntervals
+            .getIntervalByPosition(position)
+            .orElseThrow(() -> new NoSuchElementException(INTERVAL_MISS_EXCEPTION_MESSAGE));
     final int positionInSubstring = position - interval.getBegin();
     return Nucleotide.fromCharacter(nucleotidesIntervals.get(interval).charAt(positionInSubstring));
   }
@@ -83,11 +70,11 @@ public class RegionSequence {
    * @param interval interval to be found in the nucleotidesIntervals
    * @param position position to be found in the interval
    * @return nucleotide list in this interval if it is present
-   * @throws RuntimeException if position is not covered by any region
+   * @throws NoSuchElementException if position is not covered by any region
    */
   public Nucleotide getNucleotideAt(Interval interval, int position) {
     if (!listOfIntervals.intervalIsPresent(interval)) {
-      throw new RuntimeException("Interval is not present");
+      throw new NoSuchElementException(INTERVAL_MISS_EXCEPTION_MESSAGE);
     }
     return Nucleotide.fromCharacter(nucleotidesIntervals.get(interval).charAt(position));
   }
@@ -97,12 +84,13 @@ public class RegionSequence {
    *
    * @param interval interval to be found in the nucleotidesIntervals
    * @return nucleotide list in this interval if it is present
-   * @throws RuntimeException if position is not covered by any region
+   * @throws NoSuchElementException if position is not covered by any region
    */
   public Region getRegion(Interval interval) {
     if (!listOfIntervals.intervalIsPresent(interval)) {
-      throw new RuntimeException("Current interval is not covered by any region");
+      throw new NoSuchElementException(INTERVAL_IS_NOT_PRESENT_EXCEPTION_MESSAGE);
     }
-    return new Region(Nucleotide.fromString(nucleotidesIntervals.get(interval)), interval.getBegin());
+    return new Region(
+        Nucleotide.fromString(nucleotidesIntervals.get(interval)), interval.getBegin());
   }
 }

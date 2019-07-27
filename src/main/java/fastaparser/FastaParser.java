@@ -1,55 +1,73 @@
 package fastaparser;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import sequence.FastaSequence;
+import sequence.ListOfIntervals;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.NoSuchElementException;
 
-public class FastaParser {
-  private static final char HEADER_START_SYMBOL_1 = '>';
-  private static final char HEADER_START_SYMBOL_2 = ';';
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class FastaParser implements AutoCloseable {
+  private static final String HEADER_START_REGEX = "[>;].*";
+  private static final String HEADER_NAME_REGEX = "[>;](%s)";
+  private final FileInputStream fInput;
+  private BufferedReader reader;
 
   /**
-   * Returns parsed data from the file.
+   * Returns instance of the class.
    *
-   * @param fileName path to the file needed to be parsed
-   * @return instance of FastaSequence represents data from the file
-   * @throws IOException if there is no file with such path
+   * @param path path to the file needed to be parsed
+   * @return instance of FastaParser to iterate the file
    */
-  public static FastaSequence parseFasta(String fileName, Path pathToBedFile) throws IOException {
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-        new FileInputStream(fileName), StandardCharsets.UTF_8))) {
-      StringBuilder currentSequence = new StringBuilder();
+  public static FastaParser init(Path path) {
+    try {
+      FileInputStream fIn = new FileInputStream(path.toFile());
+      return new FastaParser(fIn, new BufferedReader(new InputStreamReader(fIn)));
+    } catch (FileNotFoundException e) {
+      throw new NoSuchElementException(
+          String.format("File %s not found", path.getFileName().toString()));
+    }
+  }
 
-      String line;
-
-      Map<String, String> fastaData = new HashMap<>();
-
-      String currentSequenceName = "";
-
-      if ((line = reader.readLine()) != null) {
-        currentSequenceName = line.substring(1);
-      }
-
+  public FastaSequence getRegionsForChromosome(String chromosomeName, ListOfIntervals intervals) {
+    String line;
+    StringBuilder currentSequence = new StringBuilder();
+    try {
       while ((line = reader.readLine()) != null) {
-        if (!(line.charAt(0) == HEADER_START_SYMBOL_1 || line.charAt(0) == HEADER_START_SYMBOL_2)) {
-          currentSequence.append(line);
-        } else {
-          fastaData.put(currentSequenceName, currentSequence.toString());
-          currentSequenceName = line.substring(1);
-
-          currentSequence = new StringBuilder();
+        if (line.matches(String.format(HEADER_NAME_REGEX, chromosomeName))) {
+          while ((line = reader.readLine()) != null) {
+            if (line.matches(HEADER_START_REGEX)) {
+              break;
+            }
+            currentSequence.append(line);
+          }
+          break;
         }
       }
-      fastaData.put(currentSequenceName, currentSequence.toString());
+      fInput.getChannel().position(0);
+      reader = new BufferedReader(new InputStreamReader(fInput));
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
 
-      return FastaSequence.init(fastaData, pathToBedFile);
+    if (currentSequence.toString().equals("")) {
+      throw new NoSuchElementException(
+          "Chromosome is not present or bed/fasta files are not sorted");
+    }
+
+    return FastaSequence.init(chromosomeName, currentSequence.toString(), intervals);
+  }
+
+  @Override
+  public void close() {
+    try {
+      fInput.close();
+      reader.close();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
   }
 }

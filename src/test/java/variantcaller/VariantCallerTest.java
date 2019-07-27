@@ -1,47 +1,57 @@
 package variantcaller;
 
+import bedparser.BedParser;
 import fastaparser.FastaParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import samparser.SamParser;
-import sequence.FastaSequence;
-import sequence.SamRecord;
+import sequence.BedData;
 import vcfwriter.variation.Variation;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 class VariantCallerTest {
   private static final Double minAlleleFrequency = 0.0;
   private static final String CHROMOSOME_NAME_1 = "chr1";
   private static final String CHROMOSOME_NAME_2 = "chr2";
-  private static VariantCaller variantCaller = new VariantCaller();
+  private static final String FASTA_FILE_NAME = "ex.fa";
+  private static final String BED_FILE_NAME = "ex.bed";
   private static List<Variation> variationList;
 
   @BeforeAll
-  static void init() throws URISyntaxException, IOException {
-    FastaSequence fastaSequence =
-        FastaParser.parseFasta(
-            Objects.requireNonNull(VariantCallerTest.class.getClassLoader().getResource("ex.fa"))
-                .getPath(),
+  static void init() throws URISyntaxException {
+    BedData bedData =
+        BedParser.collectIntervals(
             Paths.get(
                 Objects.requireNonNull(
-                    VariantCallerTest.class.getClassLoader().getResource("ex.bed"))
+                        VariantCallerTest.class.getClassLoader().getResource(BED_FILE_NAME))
                     .toURI()));
-    Stream<SamRecord> samRecordStream =
-        SamParser.parseSam(
-            Paths.get(
-                Objects.requireNonNull(
-                    VariantCallerTest.class.getClassLoader().getResource("ex.sam"))
-                    .toURI()));
-    variantCaller.processSamRecords(fastaSequence, samRecordStream);
-    variationList = variantCaller.filterVariations(minAlleleFrequency);
+    try (SamParser samParser =
+            SamParser.init(
+                Paths.get(
+                    Objects.requireNonNull(
+                            VariantCallerTest.class.getClassLoader().getResource("ex.sam"))
+                        .toURI()));
+        FastaParser fastaParser =
+            FastaParser.init(
+                Paths.get(
+                    Objects.requireNonNull(
+                            VariantCallerTest.class.getClassLoader().getResource(FASTA_FILE_NAME))
+                        .toURI()))) {
+
+      VariantCaller variantCaller = new VariantCaller(samParser, fastaParser);
+      variationList =
+          variantCaller
+              .processIntervalsForBedIntervals(bedData)
+              .filter(variation -> variantCaller.filterVariation(variation, minAlleleFrequency))
+              .collect(Collectors.toList());
+    }
   }
 
   @Test

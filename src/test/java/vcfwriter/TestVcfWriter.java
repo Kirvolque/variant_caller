@@ -1,9 +1,7 @@
 package vcfwriter;
 
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import temporarytools.TemporaryTools;
 import vcfwriter.variation.Variation;
 
@@ -14,81 +12,73 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class TestVcfWriter {
+class TestVcfWriter {
 
   @Test
-  public void fileCreate() {
+  void fileCreate() {
     try {
       Path path = TemporaryTools.tempFile("result", ".vcf");
-      VcfWriter vcfWriter = new VcfWriter(path.toString());
+      VcfWriter vcfWriter = VcfWriter.init(path.toString());
       Assertions.assertTrue(Files.exists(path));
       vcfWriter.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println(e.getMessage());
     }
-
   }
 
   @Test
-  public void сontainData() {
+  void containData() {
     try {
       Path path = TemporaryTools.tempFile("result", ".vcf");
-      VcfWriter vcfWriter = new VcfWriter(path.toString());
+      VcfWriter vcfWriter = VcfWriter.init(path.toString());
       Variation var1 = new Variation("20", 1444, "G", "A");
-      Variation var2 = new Variation("20", 1444, "microsati", "G", "A", "47", "PASS", "NS=3");
+      Variation var2 = new Variation("20", 1444, "microsati", "G", "A", "47", "PASS", "NS=3", 0);
       List<Variation> vars = new ArrayList<>();
       vars.add(var1);
       vars.add(var2);
-      vcfWriter.writeData(vars);
+      vcfWriter.writeVcf(vars);
       vcfWriter.close();
       Scanner scanner = new Scanner(path.toFile());
-      Assertions.assertTrue(scanner.next().equals("20"));
-      Assertions.assertTrue(scanner.nextInt() == 1444);
-      Assertions.assertTrue(scanner.next().equals("."));
-      Assertions.assertTrue(scanner.next().equals("G"));
-      Assertions.assertTrue(scanner.next().equals("A"));
-      Assertions.assertTrue(scanner.next().equals("."));
-      Assertions.assertTrue(scanner.next().equals("."));
-      Assertions.assertTrue(scanner.next().equals("."));
+      scanner.nextLine(); // skip headers
+      Assertions.assertEquals("20", scanner.next());
+      Assertions.assertEquals(1444, scanner.nextInt());
+      Assertions.assertEquals(".", scanner.next());
+      Assertions.assertEquals("G", scanner.next());
+      Assertions.assertEquals("A", scanner.next());
+      Assertions.assertEquals(".", scanner.next());
+      Assertions.assertEquals(".", scanner.next());
+      Assertions.assertEquals(".", scanner.next());
 
-      Assertions.assertTrue(scanner.next().equals("20"));
-      Assertions.assertTrue(scanner.nextInt() == 1444);
-      Assertions.assertTrue(scanner.next().equals("microsati"));
+      Assertions.assertEquals("20", scanner.next());
+      Assertions.assertEquals(1444, scanner.nextInt());
+      Assertions.assertEquals("microsati", scanner.next());
       scanner.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println(e.getMessage());
     }
-
   }
 
   @Test
-  public void containHeaders() {
+  void containHeaders() {
     try {
       Path path = TemporaryTools.tempFile("result", ".vcf");
-      VcfWriter vcfWriter = new VcfWriter(path.toString());
-      vcfWriter.writeHeadersOfData();
+      VcfWriter vcfWriter = VcfWriter.init(path.toString());
+      vcfWriter.writeVcf(new ArrayList<>());
       vcfWriter.close();
       Scanner scanner = new Scanner(path.toFile());
-      Assertions.assertTrue(scanner.next().equals("#CHROM"));
-      Assertions.assertTrue(scanner.next().equals("POS"));
-      Assertions.assertTrue(scanner.next().equals("ID"));
-      Assertions.assertTrue(scanner.next().equals("REF"));
-      Assertions.assertTrue(scanner.next().equals("ALT"));
-      Assertions.assertTrue(scanner.next().equals("QUAL"));
-      Assertions.assertTrue(scanner.next().equals("FILTER"));
-      Assertions.assertTrue(scanner.next().equals("INFO"));
+      Assertions.assertEquals("#CHROM", scanner.next());
+      Assertions.assertEquals("POS", scanner.next());
+      Assertions.assertEquals("ID", scanner.next());
+      Assertions.assertEquals("REF", scanner.next());
+      Assertions.assertEquals("ALT", scanner.next());
+      Assertions.assertEquals("QUAL", scanner.next());
+      Assertions.assertEquals("FILTER", scanner.next());
+      Assertions.assertEquals("INFO", scanner.next());
       Assertions.assertTrue(scanner.hasNextLine());
       Assertions.assertFalse(scanner.hasNext());
       scanner.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println(e.getMessage());
     }
-
   }
-
-
 }
-
