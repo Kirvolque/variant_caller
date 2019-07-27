@@ -126,7 +126,13 @@ public class VariantCaller {
   }
 
   public Stream<Variation> callVariationsForIntervals(BedData bedData) {
-    bedData.getData().forEach(this::processIntervals);
+    bedData
+        .getChromosomeListOfIntervalsTuples()
+        .forEach(
+            chromosomeListOfIntervalsTuple ->
+                this.processIntervals(
+                    chromosomeListOfIntervalsTuple.getChromosome(),
+                    chromosomeListOfIntervalsTuple.getListOfIntervals()));
     return alleleDepth.keySet().stream();
   }
 }

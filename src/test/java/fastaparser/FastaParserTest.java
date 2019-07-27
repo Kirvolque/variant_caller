@@ -39,10 +39,13 @@ class FastaParserTest {
                         FastaParserTest.class.getClassLoader().getResource(BED_FILE_NAME))
                     .toURI()));
     bedData
-        .getData()
+        .getChromosomeListOfIntervalsTuples()
         .forEach(
-            (s, intervals) ->
-                fastaSequenceList.add(fastaParser.getRegionsForChromosome(s, intervals)));
+            chromosomeListOfIntervalsTuple ->
+                fastaSequenceList.add(
+                    fastaParser.getRegionsForChromosome(
+                        chromosomeListOfIntervalsTuple.getChromosome(),
+                        chromosomeListOfIntervalsTuple.getListOfIntervals())));
   }
 
   @Test

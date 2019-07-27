@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,25 +12,31 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class BedData {
-  private Map<String, ListOfIntervals> data;
+  private List<ChromosomeListOfIntervalsTuple> chromosomeListOfIntervalsTuples;
 
   public static BedData init(Map<String, List<Interval>> data) {
-    Map<String, ListOfIntervals> result =
+    List<ChromosomeListOfIntervalsTuple> result =
         data.entrySet().stream()
-            .collect(
-                Collectors.toMap(
-                    Map.Entry::getKey,
-                    item -> new ListOfIntervals(item.getValue()),
-                    (e1, e2) -> e1,
-                    LinkedHashMap::new));
+            .map(
+                item ->
+                    new ChromosomeListOfIntervalsTuple(
+                        item.getKey(), new ListOfIntervals(item.getValue())))
+            .collect(Collectors.toList());
+
     return new BedData(result);
   }
 
   public Set<String> getChromosomes() {
-    return data.keySet();
+    return chromosomeListOfIntervalsTuples.stream()
+        .map(ChromosomeListOfIntervalsTuple::getChromosome)
+        .collect(Collectors.toSet());
   }
 
   public ListOfIntervals getIntervals(String chromosomeName) {
-    return data.get(chromosomeName);
+    return chromosomeListOfIntervalsTuples.stream()
+        .filter(item -> item.getChromosome().equals(chromosomeName))
+        .findFirst()
+        .get()
+        .getListOfIntervals();
   }
 }
