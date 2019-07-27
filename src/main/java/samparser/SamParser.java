@@ -7,7 +7,11 @@ import samparser.samrecorditerator.SamRecordIterator;
 import sequence.Interval;
 import sequence.SamRecord;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
